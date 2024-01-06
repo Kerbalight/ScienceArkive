@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/ScienceArchiveWindow/ScienceArchiveWindow.uss?fileID=7433441132597879392&amp;guid=4b9a5620d8b37364fb55a8d875500fc2&amp;type=3#ScienceArchiveWindow" />
+    <ui:VisualElement name="archive-window" class="root">
+        <ui:VisualElement name="title-bar" style="height: auto;">
+            <ui:Label tabindex="-1" text="Experiments Archive" display-tooltip-when-elided="true" style="font-size: 22px;" />
+            <ui:Button text="×" display-tooltip-when-elided="true" name="close-button" style="font-size: 24px; width: 28px; height: 28px;" />
+        </ui:VisualElement>
+        <ui:Label tabindex="-1" text="==============================================================" display-tooltip-when-elided="true" name="spacing-top" class="spacing-double-dash" style="-unity-font-definition: url(&apos;project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/LEDCounter7/led_counter-7%20SDF.asset?fileID=11400000&amp;guid=33e1e97b69ec355479ba49006381fc06&amp;type=2#led_counter-7 SDF&apos;); -unity-font: initial; color: rgb(69, 76, 91);" />
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="planets-scroll" />
+    </ui:VisualElement>
+</ui:UXML>

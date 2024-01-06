@@ -1,0 +1,22 @@
+#title-bar {
+    justify-content: space-between;
+    flex-direction: row;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.experiment-item {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.spacing-double-dash {
+}
+
+#archive-window {
+    min-width: 400px;
+    max-width: 800px;
+}
+
+#planet-foldout {
+}

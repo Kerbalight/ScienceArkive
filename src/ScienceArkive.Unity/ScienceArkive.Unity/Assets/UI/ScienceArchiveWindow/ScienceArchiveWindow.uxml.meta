@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 9385bd7822f7c8e46886177bdbf493f1
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: sciencearkive_ui.bundle
+  assetBundleVariant: 
+  script: {fileID: 13804, guid: 0000000000000000e000000000000000, type: 0}

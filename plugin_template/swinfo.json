@@ -1,0 +1,23 @@
+{
+  "spec": "2.0",
+  "mod_id": "ScienceArkive",
+  "author": "leonardfactory",
+  "name": "Science Arkive",
+  "description": "",
+  "source": "https://github.com/kerbalight/science-arkive",
+  "version": "0.1.0",
+  "version_check": "",
+  "ksp2_version": {
+    "min": "0.2.0",
+    "max": "*"
+  },
+  "dependencies": [
+    {
+      "id": "com.github.x606.spacewarp",
+      "version": {
+        "min": "1.7.0",
+        "max": "*"
+      }
+    }
+  ]
+}
