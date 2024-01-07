@@ -6,7 +6,7 @@
   "description": "",
   "source": "https://github.com/kerbalight/science-arkive",
   "version": "0.1.0",
-  "version_check": "https://raw.githubusercontent.com/Kerbalight/ScienceArkive/main/src/ScienceArkive/ScienceArkive.csproj",
+  "version_check": "https://raw.githubusercontent.com/Kerbalight/ScienceArkive/main/plugin_template/swinfo.json",
   "ksp2_version": {
     "min": "0.2.0",
     "max": "*"
