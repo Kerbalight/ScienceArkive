@@ -26,6 +26,8 @@ namespace ScienceArkive.UI
         private VisualElement _planetsList;
         private VisualElement _detailElement;
 
+        private bool _isInitialized = false;
+
         /// <summary>
         /// The state of the window. Setting this value will open or close the window.
         /// </summary>
@@ -36,9 +38,9 @@ namespace ScienceArkive.UI
             {
                 _isWindowOpen = value;
 
-                if (value)
+                if (value && !_isInitialized)
                 {
-                    InitArchive();
+                    Initialize();
                 }
 
                 // Set the display style of the root element to show or hide the window
@@ -85,24 +87,18 @@ namespace ScienceArkive.UI
             {
                 planetEntryController.ToggleCollapse();
             });
-
-            //var gameInstance = GameManager.Instance?.Game;
-            //if (gameInstance == null)
-            //{
-            //    ScienceArkivePlugin.Instance.SWLogger.LogInfo("ScienceArkive: GameManager.Instance.Game is null");
-            //    return;
-            //}
-
-            //gameInstance.AgencyManager.TryGetMyAgencyEntry(out var agencyEntry);
-            //gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var submittedReports);
-
-            //var agencyName = agencyEntry?.AgencyName ?? "Unknown Agency";
         }
 
-        private void InitArchive()
+        /// <summary>
+        /// Initializes the window when it's first opened. This is done lazily to avoid
+        /// that assets are still not available.
+        /// </summary>
+        private void Initialize()
         {
-            _rootElement.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.PlanetIcon);
-            _rootElement.Q<VisualElement>("window-icon").style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.ScienceIcon);
+            _isInitialized = true;
+
+            _rootElement.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(ExistingAssetsLoader.Instance.PlanetIcon);
+            _rootElement.Q<VisualElement>("window-icon").style.backgroundImage = new StyleBackground(ExistingAssetsLoader.Instance.ScienceIcon);
 
             RebuildPlanetList();
         }
@@ -119,7 +115,7 @@ namespace ScienceArkive.UI
             {
                 var menuItem = planetMenuItemTemplate.Instantiate();
                 menuItem.Q<Label>("name").text = celestialBody.DisplayName;
-                menuItem.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.PlanetIcon);
+                menuItem.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(ExistingAssetsLoader.Instance.PlanetIcon);
                 menuItem.Q<Button>("menu-button").RegisterCallback<ClickEvent>(_ => OnPlanetSelected(celestialBody));
                 menuItem.style.height = 40;
                 _planetsList.Add(menuItem);
@@ -147,7 +143,7 @@ namespace ScienceArkive.UI
 
         void OnPlanetSelected(CelestialBodyComponent selectedBody)
         {
-            ScienceArkivePlugin.Instance.SWLogger.LogInfo("ScienceArkive: Selected " + selectedBody.Name);
+            //ScienceArkivePlugin.Instance.SWLogger.LogInfo("ScienceArkive: Selected " + selectedBody.Name);
             SetSelectedCelestialBody(selectedBody);
         }
     }
