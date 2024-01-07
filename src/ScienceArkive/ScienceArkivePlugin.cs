@@ -10,8 +10,8 @@ using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
 using HarmonyLib;
-using ScienceArkive.UI.Manager;
 using ScienceArkive.UI.Loader;
+using ScienceArkive.Manager;
 
 namespace ScienceArkive;
 

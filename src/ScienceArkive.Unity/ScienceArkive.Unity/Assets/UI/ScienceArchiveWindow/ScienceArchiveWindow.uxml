@@ -11,16 +11,7 @@
         <ui:Label tabindex="-1" text="============================================================================================================================" display-tooltip-when-elided="true" name="spacing-top" class="spacing-double-dash" style="-unity-font-definition: url(&apos;project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/LEDCounter7/led_counter-7%20SDF.asset?fileID=11400000&amp;guid=33e1e97b69ec355479ba49006381fc06&amp;type=2#led_counter-7 SDF&apos;); -unity-font: initial; color: rgb(69, 76, 91); overflow: hidden; padding-top: 0;" />
         <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-self: stretch; justify-content: space-between; height: 431px;">
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="planet-list" style="width: 210px; height: auto; margin-right: 6px; background-color: rgba(56, 56, 56, 0);" />
-            <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: flex-start; align-items: center; flex-direction: row; min-height: 32px; margin-bottom: 6px;">
-                    <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-start; align-items: center; align-self: center;">
-                        <ui:VisualElement name="planet-icon" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; flex-shrink: 0; margin-right: 6px; background-image: none;" />
-                        <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="planet-name" style="margin-bottom: 0; min-height: auto; font-size: 16px;" />
-                    </ui:VisualElement>
-                    <ui:Button text="Toggle Collapse" display-tooltip-when-elided="true" name="toggle-collapse-button" />
-                </ui:VisualElement>
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="detail-scroll" style="min-width: 350px; min-height: 350px;" />
-            </ui:VisualElement>
+            <ui:VisualElement name="main-content" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

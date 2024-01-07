@@ -13,6 +13,7 @@ using ScienceArkive.UI.Loader;
 using KSP.Sim.impl;
 using static ProFlareAtlas;
 using System;
+using ScienceArkive.API.Extensions;
 
 namespace ScienceArkive.UI
 {
@@ -76,17 +77,13 @@ namespace ScienceArkive.UI
             var closeButton = _rootElement.Q<Button>("close-button");
             closeButton.clicked += () => IsWindowOpen = false;
 
-            var planetEntryTemplate = UIToolkitElement.Load("ScienceArchiveWindow/SciencePlanetEntry.uxml");
-            var planetEntry = planetEntryTemplate.Instantiate();
-            var planetEntryController = new SciencePlanetEntryController(planetEntry);
-            planetEntry.userData = planetEntryController;
-            _detailElement = planetEntry;
-            _rootElement.Q<VisualElement>("detail-scroll").Add(_detailElement);
-
-            _rootElement.Q<Button>("toggle-collapse-button").RegisterCallback<ClickEvent>(_ =>
-            {
-                planetEntryController.ToggleCollapse();
-            });
+            var planetDetailTemplate = UIToolkitElement.Load("ScienceArchiveWindow/PlanetExperimentsDetailPanel.uxml");
+            _detailElement = planetDetailTemplate.Instantiate();
+            var planetDetailController = new PlanetExperimentsDetailPanel(_detailElement);
+            _detailElement.userData = planetDetailController;
+  
+            // Right pane
+            _rootElement.Q<VisualElement>("main-content").Add(_detailElement);
         }
 
         /// <summary>
@@ -110,6 +107,7 @@ namespace ScienceArkive.UI
 
             var planetMenuItemTemplate = UIToolkitElement.Load("ScienceArchiveWindow/PlanetMenuItem.uxml");
             _planetsList = _rootElement.Q<VisualElement>("planet-list");
+            _planetsList.StopWheelEventPropagation();
             _planetsList.Clear();
             foreach (var celestialBody in celestialBodies)
             {
@@ -117,7 +115,7 @@ namespace ScienceArkive.UI
                 menuItem.Q<Label>("name").text = celestialBody.DisplayName;
                 menuItem.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(ExistingAssetsLoader.Instance.PlanetIcon);
                 menuItem.Q<Button>("menu-button").RegisterCallback<ClickEvent>(_ => OnPlanetSelected(celestialBody));
-                menuItem.style.height = 40;
+                menuItem.style.height = 41;
                 _planetsList.Add(menuItem);
             }
 
@@ -128,7 +126,7 @@ namespace ScienceArkive.UI
         {
             var planetLabel = _rootElement.Q<Label>("planet-name");
             planetLabel.text = selectedBody.DisplayName;
-            var planetEntryController = (SciencePlanetEntryController)_detailElement.userData;
+            var planetEntryController = (PlanetExperimentsDetailPanel)_detailElement.userData;
             planetEntryController.BindPlanet(selectedBody);
 
             foreach (var menuItem in _planetsList.Children())

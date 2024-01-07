@@ -1,39 +1,43 @@
 ﻿using KSP.Game;
 using KSP.Game.Science;
 using KSP.Sim.impl;
-using ScienceArkive.UI.Manager;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using ScienceArkive.API.Extensions;
+using ScienceArkive.Manager;
 using UnityEngine.UIElements;
 
 namespace ScienceArkive.UI.Components
 {
-    public class SciencePlanetEntryController
+    public class PlanetExperimentsDetailPanel
     {
         VisualElement _root;
-        Foldout _foldout;
+        VisualElement _detailScroll;
         VisualElement _experimentsList;
 
-        public SciencePlanetEntryController(VisualElement root)
+        public PlanetExperimentsDetailPanel(VisualElement root)
         {
             _root = root;
-            //_foldout = _root.Q<Foldout>("planet-foldout");
+            _detailScroll = _root.Q<VisualElement>("detail-scroll");
+            _detailScroll.StopWheelEventPropagation();
+
             _experimentsList = _root.Q<VisualElement>("experiments-container");
+
+            _root.Q<Button>("toggle-collapse-button").RegisterCallback<ClickEvent>(_ =>
+            {
+                ToggleCollapse();
+            });
         }
 
         public void ToggleCollapse(bool shouldCollapse = true)
         {
             foreach (var experimentEntry in _experimentsList.Children())
             {
-                var controller = experimentEntry.userData as ScienceExperimentEntryController;
+                var controller = experimentEntry.userData as ExperimentSummary;
                 controller.ToggleCollapse(shouldCollapse);
             }
         }
 
         public void BindPlanet(CelestialBodyComponent celestialBody)
         {
-            
             var gameInstance = GameManager.Instance.Game;
             var scienceDataStore = gameInstance.ScienceManager.ScienceExperimentsDataStore;
             var allExperimentIds = scienceDataStore.GetAllExperimentIDs();
@@ -63,21 +67,16 @@ namespace ScienceArkive.UI.Components
             // UI
             _experimentsList.Clear();
 
-            var experimentTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ScienceExperimentEntry.uxml");
+            var experimentTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentSummary.uxml");
             foreach (var experiment in experiments)
             {
                 var experimentEntry = experimentTemplate.Instantiate();
-                var experimentEntryController = new ScienceExperimentEntryController(experimentEntry);
+                var experimentEntryController = new ExperimentSummary(experimentEntry);
                 experimentEntryController.BindExperiment(experiment, celestialBody, completedReports);
                 experimentEntry.userData = experimentEntryController;
                 _experimentsList.Add(experimentEntry);
             }
             
-        }
-
-        private void GetAvailableExperiments()
-        {
-
         }
     }
 }

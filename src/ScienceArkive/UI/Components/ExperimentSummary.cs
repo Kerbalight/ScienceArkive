@@ -2,9 +2,9 @@
 using KSP.Game;
 using KSP.Game.Science;
 using KSP.Sim.impl;
+using ScienceArkive.Manager;
 using ScienceArkive.UI.Components;
 using ScienceArkive.UI.Loader;
-using ScienceArkive.UI.Manager;
 using SpaceWarp.API.Logging;
 using System;
 using UnityEngine;
@@ -12,19 +12,18 @@ using UnityEngine.UIElements;
 
 namespace ScienceArkive.UI
 {
-    public class ScienceExperimentEntryController
+    public class ExperimentSummary
     {
         private Foldout foldout;
         private VisualElement content;
 
         private SpaceWarp.API.Logging.ILogger logger;
 
-        public ScienceExperimentEntryController(VisualElement visualElement)
+        public ExperimentSummary(VisualElement visualElement)
         {
             logger = ScienceArkivePlugin.Instance.SWLogger;
 
             foldout = visualElement.Q<Foldout>("foldout-experiment");
-            //situationLabel = visualElement.Q<Label>("situation-label");
             content = visualElement.Q<VisualElement>("content");
         }
 
@@ -42,8 +41,8 @@ namespace ScienceArkive.UI
 
             foldout.text = LocalizationManager.GetTranslation(dataStore.GetExperimentDisplayName(expId));
 
-            var situationLabelTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentSituation.uxml");
-            var regionEntryTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ScienceExperimentRegionEntry.uxml");
+            var situationLabelTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentSituationLabel.uxml");
+            var regionEntryTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentRegionRow.uxml");
 
             foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
             {
@@ -63,7 +62,7 @@ namespace ScienceArkive.UI
                     foreach (var region in regions)
                     {
                         var regionEntry = regionEntryTemplate.Instantiate();
-                        var regionController = new ScienceExperimentRegionEntryController(regionEntry);
+                        var regionController = new ExperimentRegionRow(regionEntry);
                         var regionResearchLocation = new ResearchLocation(true, celestialBody.Name, situation, region.Id);
 
                         // This double check is not the cleanest. We use:
@@ -84,7 +83,7 @@ namespace ScienceArkive.UI
                 else
                 {
                     var regionEntry = regionEntryTemplate.Instantiate();
-                    var regionController = new ScienceExperimentRegionEntryController(regionEntry);
+                    var regionController = new ExperimentRegionRow(regionEntry);
                     regionController.Bind(experiment, researchLocation, reports.Where(r => r.ResearchLocationID == researchLocation.ResearchLocationId && r.ExperimentID == expId));
                     content.Add(regionEntry);
                 }

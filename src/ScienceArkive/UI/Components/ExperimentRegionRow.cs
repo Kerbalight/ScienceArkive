@@ -1,8 +1,8 @@
 ﻿using I2.Loc;
 using KSP.Game;
 using KSP.Game.Science;
+using ScienceArkive.Manager;
 using ScienceArkive.UI.Loader;
-using ScienceArkive.UI.Manager;
 using SpaceWarp.API.Logging;
 using System;
 using UnityEngine;
@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 
 namespace ScienceArkive.UI
 {
-    public class ScienceExperimentRegionEntryController
+    public class ExperimentRegionRow
     {
         Label nameLabel;
         private VisualElement sampleContainer;
@@ -28,7 +28,7 @@ namespace ScienceArkive.UI
         private ExperimentDefinition _experiment;
         private ResearchLocation _location;
 
-        public ScienceExperimentRegionEntryController(VisualElement visualElement)
+        public ExperimentRegionRow(VisualElement visualElement)
         {
             logger = ScienceArkivePlugin.Instance.SWLogger;
 
