@@ -4,7 +4,7 @@ using KSP.Game.Science;
 using KSP.Messages;
 using ScienceArkive.UI.Loader;
 using System.Reflection;
-namespace ScienceArkive.UI.Manager
+namespace ScienceArkive.Manager
 {
     public class ArchiveManager
     {
@@ -17,7 +17,7 @@ namespace ScienceArkive.UI.Manager
         private static readonly ManualLogSource logger = Logger.CreateLogSource("ScienceArkive.ArchiveManager");
 
         public ArchiveManager()
-        { 
+        {
         }
 
         /// <summary>
@@ -34,8 +34,8 @@ namespace ScienceArkive.UI.Manager
         {
             BuildScienceRegionsCache();
 
-            // Load assets which requires UI
-            AssetsPatchedLoader.Instance.LoadAssetsFromExistingUI();
+            // Load assets which requires Game UI
+            ExistingAssetsLoader.Instance.LoadAssetsFromExistingUI();
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace ScienceArkive.UI.Manager
             foreach (var cb in cbToScienceRegions.Keys)
             {
                 var bodyScienceData = cbToScienceRegions[cb];
-                logger.LogInfo($"Found {bodyScienceData.Regions.Length} regions for {cb}");
+                logger.LogDebug($"Found {bodyScienceData.Regions.Length} regions for {cb}");
                 CelestialBodiesScienceData.Add(cb, bodyScienceData);
             }
         }
@@ -159,5 +159,5 @@ namespace ScienceArkive.UI.Manager
         }
     }
 
-    
+
 }

@@ -45,16 +45,6 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
         LoadAssemblies();
 
         // Load the UI from the asset bundle
-        var myFirstWindowUxml = AssetManager.GetAsset<VisualTreeAsset>(
-            // The case-insensitive path to the asset in the bundle is composed of:
-            // - The mod GUID:
-            $"{ModGuid}/" +
-            // - The name of the asset bundle:
-            "ScienceArkive_ui/" +
-            // - The path to the asset in your Unity project (without the "Assets/" part)
-            "ui/myfirstwindow/myfirstwindow.uxml"
-        );
-
         var scienceArchiveWindowUxml = AssetManager.GetAsset<VisualTreeAsset>(
             $"{ModGuid}/ScienceArkive_ui/ui/sciencearchivewindow/sciencearchivewindow.uxml");
 
@@ -110,7 +100,7 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
 
         // Patches
         //Harmony.CreateAndPatchAll(typeof(ScienceRegionsPatches));
-        AssetsPatchedLoader.Instance.StartLoadingAssets();
+        ExistingAssetsLoader.Instance.StartLoadingPrefabAssets();
 
         // Messages subscribe
         ArchiveManager.Instance.SubscribeToMessages();

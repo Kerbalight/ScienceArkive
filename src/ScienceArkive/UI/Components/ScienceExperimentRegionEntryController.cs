@@ -45,10 +45,10 @@ namespace ScienceArkive.UI
             dataScienceLabel = visualElement.Q<Label>("data-science");
             dataCheck = visualElement.Q<VisualElement>("data-done-icon");
 
-            sampleIcon.style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.SampleIcon);
-            dataIcon.style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.DataIcon);
-            sampleCheck.style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.CheckIcon);
-            dataCheck.style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.CheckIcon);
+            sampleIcon.style.backgroundImage = new StyleBackground(ExistingAssetsLoader.Instance.SampleIcon);
+            dataIcon.style.backgroundImage = new StyleBackground(ExistingAssetsLoader.Instance.DataIcon);
+            sampleCheck.style.backgroundImage = new StyleBackground(ExistingAssetsLoader.Instance.CheckIcon);
+            dataCheck.style.backgroundImage = new StyleBackground(ExistingAssetsLoader.Instance.CheckIcon);
         }
 
         private float GetSampleValue()

@@ -33,11 +33,7 @@ namespace ScienceArkive.UI.Components
 
         public void BindPlanet(CelestialBodyComponent celestialBody)
         {
-            //var foldoutLabelContainer = _foldout.Q<VisualElement>(".unity-foldout__input");
-            //foldoutLabelContainer.Insert(1, )
-            //_foldout.text = celestialBody.DisplayName;
-
-            // Available experiments
+            
             var gameInstance = GameManager.Instance.Game;
             var scienceDataStore = gameInstance.ScienceManager.ScienceExperimentsDataStore;
             var allExperimentIds = scienceDataStore.GetAllExperimentIDs();
@@ -45,7 +41,7 @@ namespace ScienceArkive.UI.Components
 
             gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports);
 
-            
+            // Available experiments
             var experiments = new List<ExperimentDefinition>();
             foreach (var expId in allExperimentIds)
             {
