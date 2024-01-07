@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-    <!-- References -->
-    <ItemGroup>
-      <Compile Remove="UI\Nuova cartella1\**" />
-      <EmbeddedResource Remove="UI\Nuova cartella1\**" />
-      <None Remove="UI\Nuova cartella1\**" />
-    </ItemGroup>
     <ItemGroup Label="NuGet package references">
         <!-- Add references to any NuGet packages you want to use in your mod here -->
         <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
