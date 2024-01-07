@@ -13,12 +13,12 @@ namespace ScienceArkive.UI.Components
     {
         VisualElement _root;
         Foldout _foldout;
-        ListView _experimentsList;
+        VisualElement _experimentsList;
 
         public SciencePlanetEntryController(VisualElement root)
         {
             _root = root;
-            _foldout = _root.Q<Foldout>("planet-foldout");
+            //_foldout = _root.Q<Foldout>("planet-foldout");
             _experimentsList = _root.Q<VisualElement>("experiments-container");
         }
 
@@ -26,12 +26,11 @@ namespace ScienceArkive.UI.Components
         {
             //var foldoutLabelContainer = _foldout.Q<VisualElement>(".unity-foldout__input");
             //foldoutLabelContainer.Insert(1, )
-            _foldout.text = celestialBody.DisplayName;
+            //_foldout.text = celestialBody.DisplayName;
 
             // Available experiments
             var gameInstance = GameManager.Instance.Game;
             var scienceDataStore = gameInstance.ScienceManager.ScienceExperimentsDataStore;
-            var regionsDataProvider = gameInstance.ScienceManager.ScienceRegionsDataProvider;
             var allExperimentIds = scienceDataStore.GetAllExperimentIDs();
             var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name);
 
@@ -45,29 +44,30 @@ namespace ScienceArkive.UI.Components
                 foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
                 {
                     var researchLocation = new ResearchLocation(true, celestialBody.Name, situation, "");
-                    if (experiment.IsLocationValid(researchLocation, out var regionRequired))
+                    // This is not sufficient, we need to check if it's _possible_ to reach this location (es Kerbol_Splashed in invalid)
+                    var isLocationValid = experiment.IsLocationValid(researchLocation, out var regionRequired);
+                    var isFlavorPresent = isLocationValid && experiment.DataFlavorDescriptions.Any(flavor => flavor.ResearchLocationID.StartsWith(researchLocation.ResearchLocationId));
+                    if (isLocationValid && isFlavorPresent)
                     {
                         experiments.Add(experiment);
+                        break;
                     }
                 }
             }
 
             // UI
+            _experimentsList.Clear();
+
             var experimentTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ScienceExperimentEntry.uxml");
-            _experimentsList.itemsSource = experiments;
-            _experimentsList.makeItem = () =>
+            foreach (var experiment in experiments)
             {
-                var experimentTemplateInstance = experimentTemplate.Instantiate();
-                experimentTemplateInstance.userData = new ScienceExperimentEntryController(experimentTemplateInstance);
-                return experimentTemplateInstance;
-            };
-            _experimentsList.bindItem = (element, index) =>
-            {
-                var experimentEntryController = (ScienceExperimentEntryController)element.userData;
-                var experiment = experiments[index];
-                CompletedResearchReport? completedReport = completedReports.Find(report => report.ExperimentID == experiment.ExperimentID);
-                experimentEntryController.BindExperiment(experiment, completedReport);
-            };
+                var experimentEntry = experimentTemplate.Instantiate();
+                var experimentEntryController = new ScienceExperimentEntryController(experimentEntry);
+                experimentEntryController.BindExperiment(experiment, celestialBody, completedReports);
+                experimentEntry.userData = experimentEntryController;
+                _experimentsList.Add(experimentEntry);
+            }
+            
         }
 
         private void GetAvailableExperiments()

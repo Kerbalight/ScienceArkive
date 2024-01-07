@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using HarmonyLib;
 using ScienceArkive.UI.Manager;
+using ScienceArkive.UI.Loader;
 
 namespace ScienceArkive;
 
@@ -109,6 +110,7 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
 
         // Patches
         //Harmony.CreateAndPatchAll(typeof(ScienceRegionsPatches));
+        AssetsPatchedLoader.Instance.StartLoadingAssets();
 
         // Messages subscribe
         ArchiveManager.Instance.SubscribeToMessages();

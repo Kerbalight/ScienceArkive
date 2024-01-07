@@ -8,6 +8,11 @@ using ScienceArkive.UI.Components;
 using KSP.Game.Science;
 using HoudiniEngineUnity;
 using KSP.Sim;
+using UnityEngine.AddressableAssets;
+using ScienceArkive.UI.Loader;
+using KSP.Sim.impl;
+using static ProFlareAtlas;
+using System;
 
 namespace ScienceArkive.UI
 {
@@ -18,6 +23,8 @@ namespace ScienceArkive.UI
         private bool _isWindowOpen = false;
 
         private VisualElement _rootElement;
+        private VisualElement _planetsList;
+        private VisualElement _detailElement;
 
         /// <summary>
         /// The state of the window. Setting this value will open or close the window.
@@ -67,6 +74,15 @@ namespace ScienceArkive.UI
             var closeButton = _rootElement.Q<Button>("close-button");
             closeButton.clicked += () => IsWindowOpen = false;
 
+            var planetEntryTemplate = UIToolkitElement.Load("ScienceArchiveWindow/SciencePlanetEntry.uxml");
+            var planetEntry = planetEntryTemplate.Instantiate();
+            var planetEntryController = new SciencePlanetEntryController(planetEntry);
+            planetEntry.userData = planetEntryController;
+            _detailElement = planetEntry;
+            _rootElement.Q<VisualElement>("detail-scroll").Add(_detailElement);
+
+            _detailElement.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.PlanetIcon);
+
             var gameInstance = GameManager.Instance?.Game;
             if (gameInstance == null)
             {
@@ -85,56 +101,27 @@ namespace ScienceArkive.UI
             var gameInstance = GameManager.Instance.Game;
             var celestialBodies = gameInstance.UniverseModel.GetAllCelestialBodies();
 
-            var planetEntryTemplate = UIToolkitElement.Load("ScienceArchiveWindow/SciencePlanetEntry.uxml");
-            var planetsView = _rootElement.Q<ScrollView>("planets-scroll");
-            //planetsView.itemsSource = celestialBodies;
+            var planetMenuItemTemplate = UIToolkitElement.Load("ScienceArchiveWindow/PlanetMenuItem.uxml");
+            _planetsList = _rootElement.Q<VisualElement>("planet-list");
+            _planetsList.Clear();
             foreach (var celestialBody in celestialBodies)
             {
-                var planetEntry = planetEntryTemplate.Instantiate();
-                var planetEntryController = new SciencePlanetEntryController(planetEntry);
-                
-                planetEntryController.BindPlanet(celestialBody);
-                planetEntry.userData = planetEntryController;
-                planetsView.Add(planetEntry);
+                var menuItem = planetMenuItemTemplate.Instantiate();
+                menuItem.Q<Label>("name").text = celestialBody.DisplayName;
+                menuItem.Q<Button>("menu-button").RegisterCallback<ClickEvent>(_ => OnPlanetSelected(celestialBody));
+                menuItem.style.height = 40;
+                _planetsList.Add(menuItem);
             }
-            //planetsList.makeItem = () =>
-            //{
-            //    var planetTemplateInstance = planetTemplate.Instantiate();
-            //    planetTemplateInstance.userData = new SciencePlanetEntryController(planetTemplateInstance);
-            //    return planetTemplateInstance;
-            //};
-            //planetsList.bindItem = (element, index) =>
-            //{
-            //    var planetEntryController = (SciencePlanetEntryController)element.userData;
-            //    var celestialBody = celestialBodies[index];
-            //    planetEntryController.BindPlanet(celestialBodies[index]);
-            //};
         }
 
-        //private void InitExperimentsList()
-        //{
-        //    // Load the experiment entry template from the asset bundle
-        //    var experimentEntryUxml = UIToolkitElement.Load("ScienceArchiveWindow/ScienceExperimentEntry.uxml");
+        void OnPlanetSelected(CelestialBodyComponent selectedBody)
+        {
+            ScienceArkivePlugin.Instance.SWLogger.LogInfo("ScienceArkive: Selected " + selectedBody.Name);
 
-        //    // Load the submitted reports from the game
-        //    var gameInstance = GameManager.Instance.Game;
-        //    gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var submittedReports);
-
-        //    var experimentsList = _rootElement.Q<ListView>("experiments-list");
-        //    experimentsList.makeItem = () =>
-        //    {
-        //        var entryTemplate = experimentEntryUxml.Instantiate();
-        //        entryTemplate.userData = new ScienceExperimentEntryController(entryTemplate);
-        //        return entryTemplate;
-        //    };
-        //    experimentsList.bindItem = (element, index) =>
-        //    {
-        //        var entryController = (ScienceExperimentEntryController)element.userData;
-        //        entryController.BindExperiment(submittedReports[index]);
-        //    };
-        //    experimentsList.itemsSource = submittedReports;
-        //    experimentsList.fixedItemHeight = 40;
-            
-        //}
+            var planetLabel = _rootElement.Q<Label>("planet-name");
+            planetLabel.text = selectedBody.DisplayName;
+            var planetEntryController = (SciencePlanetEntryController)_detailElement.userData;
+            planetEntryController.BindPlanet(selectedBody);
+        }
     }
 }

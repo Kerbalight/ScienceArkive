@@ -1,9 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/ScienceArchiveWindow/ScienceArchiveWindow.uss?fileID=7433441132597879392&amp;guid=4b9a5620d8b37364fb55a8d875500fc2&amp;type=3#ScienceArchiveWindow" />
     <ui:VisualElement>
-        <ui:VisualElement class="experiment-item" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="name-label" />
-            <ui:Toggle focusable="false" value="true" />
-        </ui:VisualElement>
+        <ui:Foldout text="Foldout" name="foldout-experiment" style="margin-bottom: 8px;">
+            <ui:VisualElement name="content" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+        </ui:Foldout>
     </ui:VisualElement>
 </ui:UXML>

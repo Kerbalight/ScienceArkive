@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 4b9a5620d8b37364fb55a8d875500fc2
+guid: 28f6a52c0f6a57543aa8c659cc86d814
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -7,5 +7,4 @@ ScriptedImporter:
   userData: 
   assetBundleName: sciencearkive_ui.bundle
   assetBundleVariant: 
-  script: {fileID: 12385, guid: 0000000000000000e000000000000000, type: 0}
-  disableValidation: 0
+  script: {fileID: 13804, guid: 0000000000000000e000000000000000, type: 0}

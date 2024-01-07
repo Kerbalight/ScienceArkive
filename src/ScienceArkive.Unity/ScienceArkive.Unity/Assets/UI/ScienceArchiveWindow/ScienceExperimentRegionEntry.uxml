@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/ScienceArchiveWindow/ScienceArchiveWindow.uss?fileID=7433441132597879392&amp;guid=4b9a5620d8b37364fb55a8d875500fc2&amp;type=3#ScienceArchiveWindow" />
+    <ui:VisualElement>
+        <ui:VisualElement class="experiment-item" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); align-items: center;">
+            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="name-label" style="flex-grow: 1;" />
+            <ui:VisualElement name="sample-icon" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; flex-shrink: 0; margin-right: 6px;" />
+            <ui:VisualElement name="data-icon" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; flex-shrink: 0; margin-right: 6px;" />
+            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="region-label" style="color: rgb(170, 178, 195);" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
