@@ -39,6 +39,10 @@
     background-color: rgb(70, 62, 125);
 }
 
+.menu-item__selected {
+	background-color: rgba(70, 62, 125, 0.8);
+}
+
 .menu-item-border {
     height: 1px;
     background-image: url('project://database/Assets/UI/Icons/DotBorderPattern.png?fileID=2800000&guid=dfb501c70ce009240b24234aacb64266&type=3#DotBorderPattern');

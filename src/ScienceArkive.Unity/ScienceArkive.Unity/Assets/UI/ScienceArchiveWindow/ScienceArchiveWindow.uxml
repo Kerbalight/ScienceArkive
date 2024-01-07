@@ -1,17 +1,23 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/ScienceArchiveWindow/ScienceArchiveWindow.uss?fileID=7433441132597879392&amp;guid=4b9a5620d8b37364fb55a8d875500fc2&amp;type=3#ScienceArchiveWindow" />
     <ui:VisualElement name="archive-window" class="root">
-        <ui:VisualElement name="title-bar" style="height: auto;">
-            <ui:Label tabindex="-1" text="Experiments Archive" display-tooltip-when-elided="true" style="font-size: 22px;" />
-            <ui:Button text="×" display-tooltip-when-elided="true" name="close-button" style="font-size: 24px; width: 28px; height: 28px;" />
+        <ui:VisualElement name="title-bar" style="height: auto; margin-bottom: 2px; margin-top: 2px;">
+            <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-start; align-self: center;">
+                <ui:VisualElement name="window-icon" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; justify-content: flex-start; align-self: center; margin-right: 8px;" />
+                <ui:Label tabindex="-1" text="EXPERIMENTS ARCHIVE" display-tooltip-when-elided="true" style="font-size: 14px; -unity-font-definition: url(&apos;project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/LEDCounter7/led_counter-7%20SDF.asset?fileID=11400000&amp;guid=33e1e97b69ec355479ba49006381fc06&amp;type=2#led_counter-7 SDF&apos;);" />
+            </ui:VisualElement>
+            <ui:Button text="×" display-tooltip-when-elided="true" name="close-button" style="font-size: 24px; width: 24px; height: 24px; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0;" />
         </ui:VisualElement>
-        <ui:Label tabindex="-1" text="============================================================================================================================" display-tooltip-when-elided="true" name="spacing-top" class="spacing-double-dash" style="-unity-font-definition: url(&apos;project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/LEDCounter7/led_counter-7%20SDF.asset?fileID=11400000&amp;guid=33e1e97b69ec355479ba49006381fc06&amp;type=2#led_counter-7 SDF&apos;); -unity-font: initial; color: rgb(69, 76, 91); overflow: hidden;" />
+        <ui:Label tabindex="-1" text="============================================================================================================================" display-tooltip-when-elided="true" name="spacing-top" class="spacing-double-dash" style="-unity-font-definition: url(&apos;project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/LEDCounter7/led_counter-7%20SDF.asset?fileID=11400000&amp;guid=33e1e97b69ec355479ba49006381fc06&amp;type=2#led_counter-7 SDF&apos;); -unity-font: initial; color: rgb(69, 76, 91); overflow: hidden; padding-top: 0;" />
         <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-self: stretch; justify-content: space-between; height: 431px;">
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="planet-list" style="width: 250px; height: auto; margin-right: 6px; background-color: rgba(56, 56, 56, 0);" />
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="planet-list" style="width: 210px; height: auto; margin-right: 6px; background-color: rgba(56, 56, 56, 0);" />
             <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                 <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: flex-start; align-items: center; flex-direction: row; min-height: 32px; margin-bottom: 6px;">
-                    <ui:VisualElement name="planet-icon" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; flex-shrink: 0; margin-right: 6px; background-image: url(&apos;project://database/Assets/UI/Icons/IconMapPlanet.png?fileID=2800000&amp;guid=4247034829663ff41a65838ab520d59e&amp;type=3#IconMapPlanet&apos;);" />
-                    <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="planet-name" style="margin-bottom: 0; min-height: auto; font-size: 16px;" />
+                    <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-start; align-items: center; align-self: center;">
+                        <ui:VisualElement name="planet-icon" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; flex-shrink: 0; margin-right: 6px; background-image: none;" />
+                        <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="planet-name" style="margin-bottom: 0; min-height: auto; font-size: 16px;" />
+                    </ui:VisualElement>
+                    <ui:Button text="Toggle Collapse" display-tooltip-when-elided="true" name="toggle-collapse-button" />
                 </ui:VisualElement>
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="detail-scroll" style="min-width: 350px; min-height: 350px;" />
             </ui:VisualElement>

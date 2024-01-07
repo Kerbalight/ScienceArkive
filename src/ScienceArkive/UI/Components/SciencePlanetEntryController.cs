@@ -22,6 +22,15 @@ namespace ScienceArkive.UI.Components
             _experimentsList = _root.Q<VisualElement>("experiments-container");
         }
 
+        public void ToggleCollapse(bool shouldCollapse = true)
+        {
+            foreach (var experimentEntry in _experimentsList.Children())
+            {
+                var controller = experimentEntry.userData as ScienceExperimentEntryController;
+                controller.ToggleCollapse(shouldCollapse);
+            }
+        }
+
         public void BindPlanet(CelestialBodyComponent celestialBody)
         {
             //var foldoutLabelContainer = _foldout.Q<VisualElement>(".unity-foldout__input");

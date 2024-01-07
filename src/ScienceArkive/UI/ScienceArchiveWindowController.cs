@@ -81,22 +81,33 @@ namespace ScienceArkive.UI
             _detailElement = planetEntry;
             _rootElement.Q<VisualElement>("detail-scroll").Add(_detailElement);
 
-            _detailElement.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.PlanetIcon);
-
-            var gameInstance = GameManager.Instance?.Game;
-            if (gameInstance == null)
+            _rootElement.Q<Button>("toggle-collapse-button").RegisterCallback<ClickEvent>(_ =>
             {
-                ScienceArkivePlugin.Instance.SWLogger.LogInfo("ScienceArkive: GameManager.Instance.Game is null");
-                return;
-            }
+                planetEntryController.ToggleCollapse();
+            });
 
-            gameInstance.AgencyManager.TryGetMyAgencyEntry(out var agencyEntry);
-            gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var submittedReports);
+            //var gameInstance = GameManager.Instance?.Game;
+            //if (gameInstance == null)
+            //{
+            //    ScienceArkivePlugin.Instance.SWLogger.LogInfo("ScienceArkive: GameManager.Instance.Game is null");
+            //    return;
+            //}
 
-            var agencyName = agencyEntry?.AgencyName ?? "Unknown Agency";
+            //gameInstance.AgencyManager.TryGetMyAgencyEntry(out var agencyEntry);
+            //gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var submittedReports);
+
+            //var agencyName = agencyEntry?.AgencyName ?? "Unknown Agency";
         }
 
         private void InitArchive()
+        {
+            _rootElement.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.PlanetIcon);
+            _rootElement.Q<VisualElement>("window-icon").style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.ScienceIcon);
+
+            RebuildPlanetList();
+        }
+
+        private void RebuildPlanetList()
         {
             var gameInstance = GameManager.Instance.Game;
             var celestialBodies = gameInstance.UniverseModel.GetAllCelestialBodies();
@@ -108,20 +119,36 @@ namespace ScienceArkive.UI
             {
                 var menuItem = planetMenuItemTemplate.Instantiate();
                 menuItem.Q<Label>("name").text = celestialBody.DisplayName;
+                menuItem.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(AssetsPatchedLoader.Instance.PlanetIcon);
                 menuItem.Q<Button>("menu-button").RegisterCallback<ClickEvent>(_ => OnPlanetSelected(celestialBody));
                 menuItem.style.height = 40;
                 _planetsList.Add(menuItem);
+            }
+
+            SetSelectedCelestialBody(celestialBodies[0]);
+        }
+
+        private void SetSelectedCelestialBody(CelestialBodyComponent selectedBody)
+        {
+            var planetLabel = _rootElement.Q<Label>("planet-name");
+            planetLabel.text = selectedBody.DisplayName;
+            var planetEntryController = (SciencePlanetEntryController)_detailElement.userData;
+            planetEntryController.BindPlanet(selectedBody);
+
+            foreach (var menuItem in _planetsList.Children())
+            {
+                menuItem.Q<Button>("menu-button").RemoveFromClassList("menu-item__selected");
+                if (menuItem.Q<Label>("name").text == selectedBody.DisplayName)
+                {
+                    menuItem.Q<Button>("menu-button").AddToClassList("menu-item__selected");
+                }
             }
         }
 
         void OnPlanetSelected(CelestialBodyComponent selectedBody)
         {
             ScienceArkivePlugin.Instance.SWLogger.LogInfo("ScienceArkive: Selected " + selectedBody.Name);
-
-            var planetLabel = _rootElement.Q<Label>("planet-name");
-            planetLabel.text = selectedBody.DisplayName;
-            var planetEntryController = (SciencePlanetEntryController)_detailElement.userData;
-            planetEntryController.BindPlanet(selectedBody);
+            SetSelectedCelestialBody(selectedBody);
         }
     }
 }
