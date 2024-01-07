@@ -59,10 +59,10 @@ namespace ScienceArkive.UI.Loader
                 ScienceArkivePlugin.Instance.SWLogger.LogInfo($"Texture: {texture.name}, sprite: {texture.sprite?.name}");
             }
 
-            SampleIcon = allTextures.First(t => t.sprite.name == "ICO-Map-Asteroid-16x16").sprite;
-            DataIcon = allTextures.First(t => t.sprite.name == "ICO-Data-16").sprite;
-            ScienceIcon = allTextures.First(t => t.sprite.name == "ICO-ScienceJuice").sprite;
-            CheckIcon = allTextures.First(t => t.sprite.name == "ICO-Check").sprite;
+            SampleIcon = allTextures.First(t => t.sprite?.name == "ICO-Map-Asteroid-16x16").sprite;
+            DataIcon = allTextures.First(t => t.sprite?.name == "ICO-Data-16").sprite;
+            ScienceIcon = allTextures.First(t => t.sprite?.name == "ICO-ScienceJuice").sprite;
+            CheckIcon = allTextures.First(t => t.sprite?.name == "ICO-Check").sprite;
             ScienceArkivePlugin.Instance.SWLogger.LogInfo($"Loaded icons");
         }
     }
