@@ -6,5 +6,5 @@
             <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="name" style="-unity-font-style: normal; -unity-font-definition: url(&apos;project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/JetBrainsMono/JetBrainsMono-Regular%20SDF.asset?fileID=11400000&amp;guid=f5454c9c675002c44a5a7234bd40c390&amp;type=2#JetBrainsMono-Regular SDF&apos;);" />
         </ui:VisualElement>
     </ui:Button>
-    <ui:VisualElement class="menu-item-border" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); height: 1px;" />
+    <ui:VisualElement class="menu-item-border" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); height: 1px; -unity-background-image-tint-color: rgb(70, 72, 106);" />
 </ui:UXML>
