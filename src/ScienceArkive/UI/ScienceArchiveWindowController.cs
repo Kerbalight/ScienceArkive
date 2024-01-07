@@ -111,9 +111,19 @@ namespace ScienceArkive.UI
             _planetsList.Clear();
             foreach (var celestialBody in celestialBodies)
             {
+                var isStar = celestialBody.IsStar;
+                var isMoon = celestialBody.referenceBody != null && !celestialBody.referenceBody.IsStar;
+
                 var menuItem = planetMenuItemTemplate.Instantiate();
                 menuItem.Q<Label>("name").text = celestialBody.DisplayName;
-                menuItem.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(ExistingAssetsLoader.Instance.PlanetIcon);
+                if (isMoon) {
+                    menuItem.style.marginLeft = 20;
+                }
+
+                if (!isStar) {
+                    menuItem.Q<VisualElement>("planet-icon").style.backgroundImage = new StyleBackground(ExistingAssetsLoader.Instance.PlanetIcon);
+                }
+
                 menuItem.Q<Button>("menu-button").RegisterCallback<ClickEvent>(_ => OnPlanetSelected(celestialBody));
                 menuItem.style.height = 41;
                 _planetsList.Add(menuItem);
