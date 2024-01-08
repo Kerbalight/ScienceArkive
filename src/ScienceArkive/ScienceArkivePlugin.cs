@@ -1,17 +1,16 @@
 using System.Reflection;
 using BepInEx;
 using JetBrains.Annotations;
+using ScienceArkive.Manager;
+using ScienceArkive.UI;
+using ScienceArkive.UI.Loader;
 using SpaceWarp;
 using SpaceWarp.API.Assets;
 using SpaceWarp.API.Mods;
 using SpaceWarp.API.UI.Appbar;
-using ScienceArkive.UI;
 using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HarmonyLib;
-using ScienceArkive.UI.Loader;
-using ScienceArkive.Manager;
 
 namespace ScienceArkive;
 
@@ -24,16 +23,17 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
     [PublicAPI] public const string ModName = MyPluginInfo.PLUGIN_NAME;
     [PublicAPI] public const string ModVer = MyPluginInfo.PLUGIN_VERSION;
 
-    /// Singleton instance of the plugin class
-    [PublicAPI] public static ScienceArkivePlugin Instance { get; set; }
-
     // AppBar button IDs
     internal const string ToolbarFlightButtonID = "BTN-ScienceArkiveFlight";
     internal const string ToolbarOabButtonID = "BTN-ScienceArkiveOAB";
     internal const string ToolbarKscButtonID = "BTN-ScienceArkiveKSC";
 
+    /// Singleton instance of the plugin class
+    [PublicAPI]
+    public static ScienceArkivePlugin Instance { get; set; }
+
     /// <summary>
-    /// Runs when the mod is first initialized.
+    ///     Runs when the mod is first initialized.
     /// </summary>
     public override void OnInitialized()
     {
@@ -72,7 +72,8 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
         // Create the window
         var scienceArchiveWindow = Window.Create(windowOptions, scienceArchiveWindowUxml);
         // Add a controller for the UI to the window's game object
-        var scienceArchiveWindowController = scienceArchiveWindow.gameObject.AddComponent<ScienceArchiveWindowController>();
+        var scienceArchiveWindowController =
+            scienceArchiveWindow.gameObject.AddComponent<ScienceArchiveWindowController>();
 
         // Register Flight AppBar button
         Appbar.RegisterAppButton(
@@ -107,7 +108,7 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
     }
 
     /// <summary>
-    /// Loads all the assemblies for the mod.
+    ///     Loads all the assemblies for the mod.
     /// </summary>
     private static void LoadAssemblies()
     {
