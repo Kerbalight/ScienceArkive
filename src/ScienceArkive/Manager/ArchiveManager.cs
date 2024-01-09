@@ -9,81 +9,60 @@ namespace ScienceArkive.Manager;
 
 public class ArchiveManager
 {
-    private static readonly ManualLogSource logger = Logger.CreateLogSource("ScienceArkive.ArchiveManager");
+    private static readonly ManualLogSource _Logger = Logger.CreateLogSource("ScienceArkive.ArchiveManager");
 
     public static ArchiveManager Instance { get; } = new();
 
-    public MessageCenter MessageCenter => GameManager.Instance.Game.Messages;
-
-    public Dictionary<string, CelestialBodyScienceRegionsData> CelestialBodiesScienceData { get; private set; }
-
-    public event Action OnPostGameLoadFinished;
-
-    /// <summary>
-    ///     Subscribe to messages from the game, without blocking for the needed delay.
-    /// </summary>
-    public void SubscribeToMessages()
-    {
-        _ = Subscribe();
-    }
-
-    private async Task Subscribe()
-    {
-        await Task.Delay(100);
-        MessageCenter.Subscribe<GameLoadFinishedMessage>(OnGameLoadFinishedMessage);
-    }
-
-    private void OnGameLoadFinishedMessage(MessageCenterMessage message)
-    {
-        BuildScienceRegionsCache();
-
-        // Load assets which requires Game UI
-        ExistingAssetsLoader.Instance.LoadAssetsFromExistingUI();
-
-        OnPostGameLoadFinished?.Invoke();
-    }
+    public bool IsInitialized { get; private set; }
+    public Dictionary<string, CelestialBodyScienceRegionsData> CelestialBodiesScienceData { get; private set; } = new();
 
     /// <summary>
     ///     When the game loads, build a cache of all the science regions for each celestial body.
     ///     We are doing it here since we are using the private ScienceRegionsDataProvider class.
     /// </summary>
-    private void BuildScienceRegionsCache()
+    public void InitializeScienceRegionsCache()
     {
-        var dataProvider = GameManager.Instance?.Game?.ScienceManager.ScienceRegionsDataProvider;
+        var dataProvider = GameManager.Instance.Game?.ScienceManager?.ScienceRegionsDataProvider;
         if (dataProvider == null)
         {
-            logger.LogInfo("No ScienceRegionsDataProvider found, skipping");
+            _Logger.LogError("No ScienceRegionsDataProvider found, skipping");
             return;
         }
 
         // Get the CelestialBodyScienceRegionsData dictionary, which is private.
         var cbToScienceRegions = typeof(ScienceRegionsDataProvider)
             .GetField("_cbToScienceRegions", BindingFlags.NonPublic | BindingFlags.Instance)
-            .GetValue(dataProvider) as Dictionary<string, CelestialBodyScienceRegionsData>;
+            ?.GetValue(dataProvider) as Dictionary<string, CelestialBodyScienceRegionsData>;
+
+        if (cbToScienceRegions == null)
+        {
+            _Logger.LogWarning("No CelestialBodyScienceRegionsData found, skipping");
+            return;
+        }
 
         CelestialBodiesScienceData = [];
         foreach (var cb in cbToScienceRegions.Keys)
         {
             var bodyScienceData = cbToScienceRegions[cb];
-            logger.LogDebug($"Found {bodyScienceData.Regions.Length} regions for {cb}");
             CelestialBodiesScienceData.Add(cb, bodyScienceData);
         }
+
+        _Logger.LogInfo($"Found {CelestialBodiesScienceData.Count} celestial bodies with science regions");
+        IsInitialized = true;
     }
 
     public ScienceRegionDefinition[] GetRegionsForBody(string bodyName)
     {
-        if (CelestialBodiesScienceData.TryGetValue(bodyName, out var scienceData))
-        {
-            return scienceData.Regions;
-        }
+        if (CelestialBodiesScienceData.TryGetValue(bodyName, out var scienceData)) return scienceData.Regions;
 
-        logger.LogWarning($"No regions found for {bodyName}");
+        _Logger.LogWarning($"No regions found for {bodyName}");
         return new ScienceRegionDefinition[0];
     }
 
     public float GetScienceDifficultyMultiplier()
     {
-        if (!GameManager.Instance.Game.SessionManager.TryGetDifficultyOptionState<float>("ScienceRewards",
+        var sessionManager = GameManager.Instance.Game.SessionManager;
+        if (!sessionManager.TryGetDifficultyOptionState<float>("ScienceRewards",
                 out var scienceMultiplier)) scienceMultiplier = 1f;
 
         return scienceMultiplier;
@@ -113,7 +92,7 @@ public class ArchiveManager
                     situationScalar = scienceData.SituationData.AtmosphereScalar;
                     break;
                 default:
-                    logger.LogWarning($"GetResearchLocationScalar: Unknown situation {location.ScienceSituation}");
+                    _Logger.LogWarning($"GetResearchLocationScalar: Unknown situation {location.ScienceSituation}");
                     break;
             }
 
@@ -139,19 +118,19 @@ public class ArchiveManager
                             regionScalar = 1f; // No scalar effect
                             break;
                         default:
-                            logger.LogWarning(
+                            _Logger.LogWarning(
                                 $"GetResearchLocationScalar: Unknown situation for region: {location.ScienceSituation}");
                             break;
                     }
                 else
-                    logger.LogWarning($"GetResearchLocationScalar: Unknown region {location.ScienceRegion}");
+                    _Logger.LogWarning($"GetResearchLocationScalar: Unknown region {location.ScienceRegion}");
             }
 
             scienceScalar = bodyScalar * situationScalar * regionScalar * GetScienceDifficultyMultiplier();
         }
         else
         {
-            logger.LogWarning($"No scalar found for {location.BodyName}");
+            _Logger.LogWarning($"No scalar found for {location.BodyName}");
             scienceScalar = 1f;
         }
     }

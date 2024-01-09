@@ -10,6 +10,7 @@ namespace ScienceArkive.UI.Components;
 public class PlanetExperimentsDetailPanel
 {
     private readonly VisualElement _detailScroll;
+    private readonly Label _nameLabel;
     private readonly VisualElement _experimentsList;
     private readonly VisualElement _root;
     private CelestialBodyComponent _celestialBody;
@@ -20,6 +21,7 @@ public class PlanetExperimentsDetailPanel
         _detailScroll = _root.Q<VisualElement>("detail-scroll");
         _detailScroll.StopWheelEventPropagation();
 
+        _nameLabel = _root.Q<Label>("planet-name");
         _experimentsList = _root.Q<VisualElement>("experiments-container");
 
         _root.Q<Button>("toggle-collapse-button").RegisterCallback<ClickEvent>(_ => { ToggleCollapse(); });
@@ -77,5 +79,8 @@ public class PlanetExperimentsDetailPanel
             experimentEntry.userData = experimentEntryController;
             _experimentsList.Add(experimentEntry);
         }
+
+        // UI Label
+        _nameLabel.text = celestialBody.DisplayName;
     }
 }

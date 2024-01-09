@@ -25,6 +25,8 @@ public class ExistingAssetsLoader
 
     public static ExistingAssetsLoader Instance { get; } = new();
 
+    private bool _isExistingLoaded;
+
     /// <summary>
     ///     Loads the required assets from game prefabs. Since this task is async (but does
     ///     not require the UI to be loaded), it can be started as soon as the plugin is initialized.
@@ -49,6 +51,12 @@ public class ExistingAssetsLoader
     /// </summary>
     public void LoadAssetsFromExistingUI()
     {
+        if (_isExistingLoaded)
+        {
+            ScienceArkivePlugin.Instance.SWLogger.LogDebug("Assets already loaded, skipping");
+            return;
+        }
+
         try
         {
             // Icons from UI
@@ -56,9 +64,11 @@ public class ExistingAssetsLoader
                 GameObject.Find(BreadcrumbsControllerPath).GetComponent<BreadcrumbsController>();
             var breadcrumbsIcons = typeof(BreadcrumbsController)
                 .GetField("_breadcrumbsIcons", BindingFlags.NonPublic | BindingFlags.Instance)
-                .GetValue(breadcrumbsController) as Dictionary<BreadcrumbsType, Sprite>;
+                ?.GetValue(breadcrumbsController) as Dictionary<BreadcrumbsType, Sprite>;
 
             PlanetIcon = breadcrumbsIcons[BreadcrumbsType.Celestial];
+
+            _isExistingLoaded = true;
         }
         catch (Exception e)
         {

@@ -44,43 +44,17 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
         // Load all the other assemblies used by this mod
         LoadAssemblies();
 
-        // Load the UI from the asset bundle
-        var scienceArchiveWindowUxml = AssetManager.GetAsset<VisualTreeAsset>(
-            $"{ModGuid}/ScienceArkive_ui/ui/sciencearchivewindow/sciencearchivewindow.uxml");
+        // Initialize the UI
+        MainUIManager.Instance.Initialize();
 
-        // Create the window options object
-        var windowOptions = new WindowOptions
-        {
-            // The ID of the window. It should be unique to your mod.
-            WindowId = "ScienceArkive_MainWindow",
-            // The transform of parent game object of the window.
-            // If null, it will be created under the main canvas.
-            Parent = null,
-            // Whether or not the window can be hidden with F2.
-            IsHidingEnabled = true,
-            // Whether to disable game input when typing into text fields.
-            DisableGameInputForTextFields = true,
-            MoveOptions = new MoveOptions
-            {
-                // Whether or not the window can be moved by dragging.
-                IsMovingEnabled = true,
-                // Whether or not the window can only be moved within the screen bounds.
-                CheckScreenBounds = false
-            }
-        };
-
-        // Create the window
-        var scienceArchiveWindow = Window.Create(windowOptions, scienceArchiveWindowUxml);
-        // Add a controller for the UI to the window's game object
-        var scienceArchiveWindowController =
-            scienceArchiveWindow.gameObject.AddComponent<ScienceArchiveWindowController>();
+        Logger.LogInfo("OnInitialized: Registering Appbar buttons");
 
         // Register Flight AppBar button
         Appbar.RegisterAppButton(
             ModName,
             ToolbarFlightButtonID,
             AssetManager.GetAsset<Texture2D>($"{ModGuid}/images/icon.png"),
-            isOpen => scienceArchiveWindowController.IsWindowOpen = isOpen
+            isOpen => MainUIManager.Instance.ToggleUI(isOpen)
         );
 
         // Register OAB AppBar Button
@@ -88,7 +62,7 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
             ModName,
             ToolbarOabButtonID,
             AssetManager.GetAsset<Texture2D>($"{ModGuid}/images/icon.png"),
-            isOpen => scienceArchiveWindowController.IsWindowOpen = isOpen
+            isOpen => MainUIManager.Instance.ToggleUI(isOpen)
         );
 
         // Register KSC AppBar Button
@@ -96,7 +70,7 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
             ModName,
             ToolbarKscButtonID,
             AssetManager.GetAsset<Texture2D>($"{ModGuid}/images/icon.png"),
-            () => scienceArchiveWindowController.IsWindowOpen = !scienceArchiveWindowController.IsWindowOpen
+            () => MainUIManager.Instance.ToggleUI()
         );
 
         // Patches
@@ -104,7 +78,7 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
         ExistingAssetsLoader.Instance.StartLoadingPrefabAssets();
 
         // Messages subscribe
-        ArchiveManager.Instance.SubscribeToMessages();
+        MessageListener.Instance.SubscribeToMessages();
     }
 
     /// <summary>
