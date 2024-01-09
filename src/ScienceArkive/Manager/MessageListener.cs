@@ -24,6 +24,7 @@ public class MessageListener
         await Task.Delay(100);
         MessageCenter.PersistentSubscribe<GameLoadFinishedMessage>(OnGameLoadFinishedMessage);
         MessageCenter.PersistentSubscribe<ScienceEarnedOnRecoveryMessage>(OnScienceEarnedOnRecoveryMessage);
+        MessageCenter.PersistentSubscribe<GameStateChangedMessage>(HideWindowOnInvalidState);
     }
 
     private void OnGameLoadFinishedMessage(MessageCenterMessage message)
@@ -33,10 +34,17 @@ public class MessageListener
         // Build the science regions cache
         if (!ArchiveManager.Instance.IsInitialized)
             ArchiveManager.Instance.InitializeScienceRegionsCache();
+        // Refresh the UI
+        MainUIManager.Instance.ArchiveWindowController.BuildUI();
     }
 
     private void OnScienceEarnedOnRecoveryMessage(MessageCenterMessage message)
     {
         MainUIManager.Instance.ArchiveWindowController.Refresh();
+    }
+
+    private void HideWindowOnInvalidState(MessageCenterMessage message)
+    {
+        if (GameStateManager.Instance.IsInvalidState()) MainUIManager.Instance.ToggleUI(false);
     }
 }
