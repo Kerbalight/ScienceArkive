@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using JetBrains.Annotations;
 using KSP.Game;
 using KSP.Messages;
 using KSP.Sim.impl;
@@ -20,7 +21,19 @@ public class ScienceArchiveWindowController : MonoBehaviour
 
     private bool _isInitialized;
     private bool _isWindowOpen;
-    private CelestialBodyComponent _selectedCelestialBody;
+    [CanBeNull] private CelestialBodyComponent _selectedCelestialBody;
+
+    [CanBeNull]
+    public CelestialBodyComponent SelectedCelestialBody
+    {
+        get => _selectedCelestialBody;
+        set
+        {
+            _selectedCelestialBody = value;
+            _planetDetailController.BindPlanet(value);
+            _planetListController.SetSelectedCelestialBody(value);
+        }
+    }
 
     private VisualElement _rootElement;
     private VisualElement _detailElement;
@@ -40,6 +53,10 @@ public class ScienceArchiveWindowController : MonoBehaviour
         set
         {
             _isWindowOpen = value;
+
+            // Not sure if this is the best place to do this. We need the UI to be built before we can load the data
+            // into it.
+            SaveManager.Instance.LoadDataIntoUI();
 
             if (value && !_isInitialized) Initialize();
 
@@ -80,7 +97,7 @@ public class ScienceArchiveWindowController : MonoBehaviour
         // Left pane
         var planetList = _rootElement.Q<VisualElement>("planet-list");
         _planetListController = new PlanetListController(planetList);
-        _planetListController.PlanetSelected += SetSelectedCelestialBody;
+        _planetListController.PlanetSelected += body => SelectedCelestialBody = body;
 
         // Right pane
         var planetDetailTemplate = UIToolkitElement.Load("ScienceArchiveWindow/PlanetExperimentsDetailPanel.uxml");
@@ -88,6 +105,9 @@ public class ScienceArchiveWindowController : MonoBehaviour
         _planetDetailController = new PlanetExperimentsDetailPanel(_detailElement);
         _detailElement.userData = _planetDetailController;
         _rootElement.Q<VisualElement>("main-content").Add(_detailElement);
+
+        // Window drag
+        _rootElement.RegisterCallback<PointerUpEvent>(OnWindowDraggedPointerUp);
     }
 
     /// <summary>
@@ -96,15 +116,19 @@ public class ScienceArchiveWindowController : MonoBehaviour
     /// </summary>
     private void Initialize()
     {
-        logger.LogInfo("Initializing window");
+        logger.LogInfo("Initializing window (first display)");
         _isInitialized = true;
 
         _rootElement.Q<VisualElement>("planet-icon").style.backgroundImage =
             new StyleBackground(ExistingAssetsLoader.Instance.PlanetIcon);
         _rootElement.Q<VisualElement>("window-icon").style.backgroundImage =
             new StyleBackground(ExistingAssetsLoader.Instance.ScienceIcon);
+    }
 
-        _rootElement.RegisterCallback<PointerUpEvent>(evt => { WindowPosition = _rootElement.transform.position; });
+    private void OnWindowDraggedPointerUp(PointerUpEvent evt)
+    {
+        logger.LogDebug($"Window position updated {_rootElement.transform.position}");
+        WindowPosition = _rootElement.transform.position;
     }
 
     public void BuildUI()
@@ -112,19 +136,13 @@ public class ScienceArchiveWindowController : MonoBehaviour
         logger.LogInfo("Building UI");
         _rootElement.transform.position = WindowPosition ?? _rootElement.transform.position;
         _planetListController.BuildPlanetList();
-        SetSelectedCelestialBody(GameManager.Instance.Game.UniverseModel.GetAllCelestialBodies()[0]);
-    }
 
-    private void SetSelectedCelestialBody(CelestialBodyComponent selectedBody)
-    {
-        _selectedCelestialBody = selectedBody;
-        _planetListController.SetSelectedCelestialBody(selectedBody);
-        _planetDetailController.BindPlanet(selectedBody);
+        SelectedCelestialBody ??= GameManager.Instance.Game.UniverseModel.GetAllCelestialBodies()[0];
     }
 
     public void Refresh()
     {
-        logger.LogInfo($"Refreshing window selected planet (body {_selectedCelestialBody?.DisplayName})");
-        if (_selectedCelestialBody != null) SetSelectedCelestialBody(_selectedCelestialBody);
+        logger.LogInfo($"Refreshing window selected planet (body {SelectedCelestialBody?.DisplayName})");
+        if (SelectedCelestialBody != null) SelectedCelestialBody = SelectedCelestialBody;
     }
 }
