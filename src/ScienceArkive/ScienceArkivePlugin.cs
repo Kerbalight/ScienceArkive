@@ -80,8 +80,15 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
         // Messages subscribe
         MessageListener.Instance.SubscribeToMessages();
 
+        // Setup config (settings)
+        Utils.Settings.SetupConfig();
+
         // Save manager
         SaveManager.Instance.Register();
+    }
+
+    private static void SetupConfig()
+    {
     }
 
     /// <summary>

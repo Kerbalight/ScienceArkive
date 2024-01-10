@@ -4,6 +4,7 @@ using KSP.Game.Science;
 using KSP.Sim.impl;
 using ScienceArkive.Manager;
 using ScienceArkive.UI.Components;
+using ScienceArkive.Utils;
 using SpaceWarp.API.Logging;
 using UnityEngine.UIElements;
 
@@ -58,7 +59,8 @@ public class ExperimentSummary
 
             if (regionRequired)
             {
-                var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name, true);
+                var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name,
+                    Settings.DiscoverablesDisplay.Value == Settings.DiscoverablesDisplayMode.Discovered);
                 foreach (var region in regions)
                 {
                     var regionEntry = regionEntryTemplate.Instantiate();

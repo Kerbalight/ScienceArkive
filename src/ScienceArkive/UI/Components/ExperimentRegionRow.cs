@@ -3,6 +3,7 @@ using KSP.Game;
 using KSP.Game.Science;
 using ScienceArkive.Manager;
 using ScienceArkive.UI.Loader;
+using ScienceArkive.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 using ILogger = SpaceWarp.API.Logging.ILogger;
@@ -74,21 +75,28 @@ public class ExperimentRegionRow
         //var flavorText = dataStore.GetFlavorText(expId, report.ResearchLocationID, report.ResearchReportType);
         var displayName = dataStore.GetExperimentDisplayName(expId);
         var requirements = dataStore.GetExperimentDisplayRequirements(expId);
+        var isRegionVisible = ArchiveManager.Instance.IsRegionVisible(location.BodyName, location.ScienceRegion,
+            out var isRegionDiscoverable);
 
         var reportName = dataStore.GetExperimentReportName(expId,
             experiment.ExperimentType == ScienceExperimentType.DataType
                 ? ScienceReportType.DataType
                 : ScienceReportType.SampleType);
         nameLabel.text = LocalizationManager.GetTranslation(displayName);
-        regionLabel.text = ScienceRegionsHelper.GetRegionDisplayName(location.ScienceRegion);
+
+        regionLabel.text = !isRegionVisible && isRegionDiscoverable &&
+                           Settings.DiscoverablesDisplay.Value == Settings.DiscoverablesDisplayMode.Censored
+            ? "???"
+            : ScienceRegionsHelper.GetRegionDisplayName(location.ScienceRegion);
         regionLabel.tooltip = LocalizationManager.GetTranslation(requirements);
 
         // Sample
-        if (experiment.ExperimentType == ScienceExperimentType.SampleType ||
-            experiment.ExperimentType == ScienceExperimentType.Both)
+        var completedResearchReports = regionReports as CompletedResearchReport[] ?? regionReports.ToArray();
+
+        if (experiment.ExperimentType is ScienceExperimentType.SampleType or ScienceExperimentType.Both)
         {
             sampleContainer.style.visibility = Visibility.Visible;
-            var sampleReport = regionReports.Where(r => r.ResearchReportType == ScienceReportType.SampleType)
+            var sampleReport = completedResearchReports.Where(r => r.ResearchReportType == ScienceReportType.SampleType)
                 .Cast<CompletedResearchReport?>().FirstOrDefault();
             sampleIcon.style.unityBackgroundImageTintColor = sampleReport == null ? Color.white : Color.cyan;
             sampleCheck.style.visibility = sampleReport == null ? Visibility.Hidden : Visibility.Visible;
@@ -101,17 +109,16 @@ public class ExperimentRegionRow
         }
 
         // Data
-        if (experiment.ExperimentType == ScienceExperimentType.DataType ||
-            experiment.ExperimentType == ScienceExperimentType.Both)
+        if (experiment.ExperimentType is ScienceExperimentType.DataType or ScienceExperimentType.Both)
         {
             dataContainer.style.visibility = Visibility.Visible;
-            var dataReport = regionReports.Where(r => r.ResearchReportType == ScienceReportType.DataType)
+            var dataReport = completedResearchReports.Where(r => r.ResearchReportType == ScienceReportType.DataType)
                 .Cast<CompletedResearchReport?>().FirstOrDefault();
             dataIcon.style.unityBackgroundImageTintColor = dataReport == null ? Color.white : Color.cyan;
             dataCheck.style.visibility = dataReport == null ? Visibility.Hidden : Visibility.Visible;
             dataScienceLabel.text = GetDataValue().ToString("0.00");
 
-            if (dataReport.HasValue && dataReport.Value.FinalScienceValue != GetDataValue())
+            if (dataReport.HasValue && Math.Abs(dataReport.Value.FinalScienceValue - GetDataValue()) > 1E-5f)
                 logger.LogWarning(
                     $"Science value mismatch for {reportName} ({dataReport.Value.ResearchLocationID}): {dataReport?.FinalScienceValue} != {GetDataValue()}");
         }

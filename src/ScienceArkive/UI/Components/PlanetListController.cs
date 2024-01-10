@@ -4,6 +4,7 @@ using KSP.Sim.impl;
 using ScienceArkive.API.Extensions;
 using ScienceArkive.Manager;
 using ScienceArkive.UI.Loader;
+using ScienceArkive.Utils;
 using UnityEngine.UIElements;
 
 namespace ScienceArkive.UI.Components;
@@ -23,7 +24,6 @@ public class PlanetListController
     {
         _root = root;
         _planetsList = _root.Q<VisualElement>("planet-list");
-        _planetsList.StopWheelEventPropagation();
         _planetsList.Clear();
     }
 
@@ -32,7 +32,8 @@ public class PlanetListController
         _Logger.LogInfo("building planet list");
         var gameInstance = GameManager.Instance.Game;
         var celestialBodies = gameInstance.UniverseModel.GetAllCelestialBodies();
-        var displayedBodiesNames = ArchiveManager.Instance.GetCelestialBodiesNames(true);
+        var displayedBodiesNames =
+            ArchiveManager.Instance.GetCelestialBodiesNames(Settings.ShowOnlyVisitedPlanets.Value).ToArray();
 
         _planetsList.Clear();
         DisplayedBodies.Clear();
@@ -73,7 +74,7 @@ public class PlanetListController
 
     private void OnPlanetSelected(CelestialBodyComponent selectedBody)
     {
-        //logger.LogInfo("ScienceArkive: Selected " + selectedBody.Name);
+        _Logger.LogDebug("ScienceArkive: Selected " + selectedBody.Name);
         SetSelectedCelestialBody(selectedBody);
         PlanetSelected?.Invoke(selectedBody);
     }

@@ -47,4 +47,9 @@ public class MainUIManager
         ArchiveWindowController =
             ArchiveWindowDocument.gameObject.AddComponent<ScienceArchiveWindowController>();
     }
+
+    public void Refresh()
+    {
+        ArchiveWindowController.Refresh();
+    }
 }

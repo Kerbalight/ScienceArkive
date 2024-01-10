@@ -3,6 +3,7 @@ using KSP.Game.Science;
 using KSP.Sim.impl;
 using ScienceArkive.API.Extensions;
 using ScienceArkive.Manager;
+using ScienceArkive.Utils;
 using UnityEngine.UIElements;
 
 namespace ScienceArkive.UI.Components;
@@ -19,7 +20,6 @@ public class PlanetExperimentsDetailPanel
     {
         _root = root;
         _detailScroll = _root.Q<VisualElement>("detail-scroll");
-        _detailScroll.StopWheelEventPropagation();
 
         _nameLabel = _root.Q<Label>("planet-name");
         _experimentsList = _root.Q<VisualElement>("experiments-container");
@@ -50,8 +50,10 @@ public class PlanetExperimentsDetailPanel
         gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports);
 
         // Available experiments
+        var displayedExperiments = ArchiveManager.Instance.GetExperimentDefinitions(Settings.ShowOnlyUnlockedExperiments
+            .Value);
         var experiments = new List<ExperimentDefinition>();
-        foreach (var experiment in ArchiveManager.Instance.GetExperimentDefinitions(true))
+        foreach (var experiment in displayedExperiments)
         foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
         {
             var researchLocation = new ResearchLocation(true, celestialBody.Name, situation, "");

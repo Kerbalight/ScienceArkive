@@ -161,6 +161,14 @@ public class ArchiveManager
         return regions;
     }
 
+    public bool IsRegionVisible(string bodyName, string regionId, out bool isDiscoverable)
+    {
+        var scienceRegionsDataProvider = GameManager.Instance.Game.ScienceManager.ScienceRegionsDataProvider;
+        isDiscoverable = scienceRegionsDataProvider.IsRegionADiscoverable(bodyName, regionId);
+        return !isDiscoverable ||
+               _firsts.DiscoverableReached.ContainsKey($"{bodyName}_{regionId}");
+    }
+
     public bool IsExperimentUnlocked(string experimentId)
     {
         return _unlockedExperimentsIds.Contains(experimentId);
