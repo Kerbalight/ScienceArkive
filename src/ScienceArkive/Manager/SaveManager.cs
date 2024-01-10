@@ -11,7 +11,7 @@ public class SaveManager
     public static SaveManager Instance { get; private set; } = new();
     private readonly ManualLogSource _Logger = Logger.CreateLogSource("ScienceArkive.SaveManager");
 
-    private SaveData loadedSaveData;
+    private SaveData? loadedSaveData;
 
     public void Register()
     {

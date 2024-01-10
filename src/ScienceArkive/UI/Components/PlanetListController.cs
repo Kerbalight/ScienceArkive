@@ -2,6 +2,7 @@
 using KSP.Game;
 using KSP.Sim.impl;
 using ScienceArkive.API.Extensions;
+using ScienceArkive.Manager;
 using ScienceArkive.UI.Loader;
 using UnityEngine.UIElements;
 
@@ -14,7 +15,7 @@ public class PlanetListController
     private VisualElement _root;
     private VisualElement _planetsList;
 
-    public event Action<CelestialBodyComponent> PlanetSelected;
+    public event Action<CelestialBodyComponent>? PlanetSelected;
 
     public PlanetListController(VisualElement root)
     {
@@ -29,11 +30,14 @@ public class PlanetListController
         _Logger.LogInfo("building planet list");
         var gameInstance = GameManager.Instance.Game;
         var celestialBodies = gameInstance.UniverseModel.GetAllCelestialBodies();
+        var displayedBodiesNames = ArchiveManager.Instance.GetCelestialBodiesNames(true);
 
         _planetsList.Clear();
         var planetMenuItemTemplate = UIToolkitElement.Load("ScienceArchiveWindow/PlanetMenuItem.uxml");
         foreach (var celestialBody in celestialBodies)
         {
+            if (!celestialBody.isHomeWorld && !displayedBodiesNames.Contains(celestialBody.Name)) continue;
+
             var isStar = celestialBody.IsStar;
             var isMoon = celestialBody.referenceBody is { IsStar: false };
 
@@ -51,12 +55,12 @@ public class PlanetListController
         }
     }
 
-    public void SetSelectedCelestialBody(CelestialBodyComponent selectedBody)
+    public void SetSelectedCelestialBody(CelestialBodyComponent? selectedBody)
     {
         foreach (var menuItem in _planetsList.Children())
         {
             menuItem.Q<Button>("menu-button").RemoveFromClassList("menu-item__selected");
-            if (menuItem.Q<Label>("name").text == selectedBody.DisplayName)
+            if (menuItem.Q<Label>("name").text == selectedBody?.DisplayName)
                 menuItem.Q<Button>("menu-button").AddToClassList("menu-item__selected");
         }
     }

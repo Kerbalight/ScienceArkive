@@ -21,10 +21,9 @@ public class ScienceArchiveWindowController : MonoBehaviour
 
     private bool _isInitialized;
     private bool _isWindowOpen;
-    [CanBeNull] private CelestialBodyComponent _selectedCelestialBody;
+    private CelestialBodyComponent? _selectedCelestialBody;
 
-    [CanBeNull]
-    public CelestialBodyComponent SelectedCelestialBody
+    public CelestialBodyComponent? SelectedCelestialBody
     {
         get => _selectedCelestialBody;
         set
@@ -35,12 +34,12 @@ public class ScienceArchiveWindowController : MonoBehaviour
         }
     }
 
-    private VisualElement _rootElement;
-    private VisualElement _detailElement;
-    private PlanetListController _planetListController;
-    private PlanetExperimentsDetailPanel _planetDetailController;
+    private VisualElement _rootElement = null!;
+    private VisualElement _detailElement = null!;
+    private PlanetListController _planetListController = null!;
+    private PlanetExperimentsDetailPanel _planetDetailController = null!;
 
-    private UIDocument _window;
+    private UIDocument _window = null!;
 
     public Vector3? WindowPosition = null;
 

@@ -23,7 +23,8 @@ public class MessageListener
     {
         await Task.Delay(100);
         MessageCenter.PersistentSubscribe<GameLoadFinishedMessage>(OnGameLoadFinishedMessage);
-        MessageCenter.PersistentSubscribe<ScienceEarnedOnRecoveryMessage>(OnScienceEarnedOnRecoveryMessage);
+        MessageCenter.PersistentSubscribe<ResearchReportScoredMessage>(OnResearchReportScoredMessage);
+        MessageCenter.PersistentSubscribe<VesselScienceSituationChangedMessage>(OnVesselScienceSituationChangedMessage);
         MessageCenter.PersistentSubscribe<GameStateChangedMessage>(HideWindowOnInvalidState);
     }
 
@@ -31,14 +32,18 @@ public class MessageListener
     {
         // Load assets which requires Game UI
         ExistingAssetsLoader.Instance.LoadAssetsFromExistingUI();
-        // Build the science regions cache
-        if (!ArchiveManager.Instance.IsInitialized)
-            ArchiveManager.Instance.InitializeScienceRegionsCache();
+        // Build the science regions cache & check discoverables
+        ArchiveManager.Instance.Initialize();
         // Refresh the UI
         MainUIManager.Instance.ArchiveWindowController.BuildUI();
     }
 
-    private void OnScienceEarnedOnRecoveryMessage(MessageCenterMessage message)
+    private void OnResearchReportScoredMessage(MessageCenterMessage message)
+    {
+        MainUIManager.Instance.ArchiveWindowController.Refresh();
+    }
+
+    private void OnVesselScienceSituationChangedMessage(MessageCenterMessage message)
     {
         MainUIManager.Instance.ArchiveWindowController.Refresh();
     }

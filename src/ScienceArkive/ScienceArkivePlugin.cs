@@ -30,7 +30,7 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
 
     /// Singleton instance of the plugin class
     [PublicAPI]
-    public static ScienceArkivePlugin Instance { get; set; }
+    public static ScienceArkivePlugin Instance { get; set; } = null!;
 
     /// <summary>
     ///     Runs when the mod is first initialized.

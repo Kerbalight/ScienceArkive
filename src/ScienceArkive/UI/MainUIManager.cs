@@ -8,8 +8,8 @@ public class MainUIManager
 {
     public static MainUIManager Instance { get; } = new();
 
-    public UIDocument ArchiveWindowDocument { get; private set; }
-    public ScienceArchiveWindowController ArchiveWindowController { get; private set; }
+    public UIDocument ArchiveWindowDocument { get; private set; } = null!;
+    public ScienceArchiveWindowController ArchiveWindowController { get; private set; } = null!;
 
     public void Initialize()
     {

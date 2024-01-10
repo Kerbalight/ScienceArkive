@@ -11,8 +11,8 @@ namespace ScienceArkive.UI;
 
 public class ExperimentRegionRow
 {
-    private ExperimentDefinition _experiment;
-    private ResearchLocation _location;
+    private ExperimentDefinition _experiment = null!;
+    private ResearchLocation _location = null!;
     private readonly VisualElement dataCheck;
 
     private readonly VisualElement dataContainer;

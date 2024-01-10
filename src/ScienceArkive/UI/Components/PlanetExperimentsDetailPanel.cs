@@ -13,7 +13,7 @@ public class PlanetExperimentsDetailPanel
     private readonly Label _nameLabel;
     private readonly VisualElement _experimentsList;
     private readonly VisualElement _root;
-    private CelestialBodyComponent _celestialBody;
+    private CelestialBodyComponent? _celestialBody;
 
     public PlanetExperimentsDetailPanel(VisualElement root)
     {
@@ -32,18 +32,20 @@ public class PlanetExperimentsDetailPanel
         foreach (var experimentEntry in _experimentsList.Children())
         {
             var controller = experimentEntry.userData as ExperimentSummary;
-            controller.ToggleCollapse(shouldCollapse);
+            controller?.ToggleCollapse(shouldCollapse);
         }
     }
 
-    public void BindPlanet(CelestialBodyComponent celestialBody)
+    public void BindPlanet(CelestialBodyComponent? celestialBody)
     {
+        if (celestialBody == null) return;
+
         _celestialBody = celestialBody;
 
         var gameInstance = GameManager.Instance.Game;
         var scienceDataStore = gameInstance.ScienceManager.ScienceExperimentsDataStore;
         var allExperimentIds = scienceDataStore.GetAllExperimentIDs();
-        var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name);
+        var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name, true);
 
         gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports);
 

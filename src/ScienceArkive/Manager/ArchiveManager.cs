@@ -3,6 +3,8 @@ using BepInEx.Logging;
 using KSP.Game;
 using KSP.Game.Science;
 using KSP.Messages;
+using KSP.Sim;
+using ScienceArkive.API.Extensions;
 using ScienceArkive.UI.Loader;
 
 namespace ScienceArkive.Manager;
@@ -13,14 +15,13 @@ public class ArchiveManager
 
     public static ArchiveManager Instance { get; } = new();
 
-    public bool IsInitialized { get; private set; }
+    private bool IsInitialized { get; set; }
     public Dictionary<string, CelestialBodyScienceRegionsData> CelestialBodiesScienceData { get; private set; } = new();
 
-    /// <summary>
-    ///     When the game loads, build a cache of all the science regions for each celestial body.
-    ///     We are doing it here since we are using the private ScienceRegionsDataProvider class.
-    /// </summary>
-    public void InitializeScienceRegionsCache()
+    private TravelFirsts _firsts = null!;
+
+
+    public void Initialize()
     {
         var dataProvider = GameManager.Instance.Game?.ScienceManager?.ScienceRegionsDataProvider;
         if (dataProvider == null)
@@ -28,6 +29,28 @@ public class ArchiveManager
             _Logger.LogError("No ScienceRegionsDataProvider found, skipping");
             return;
         }
+
+        // Build the cache of science regions
+        InitializeScienceRegionsCache();
+        // Save reference to `TravelFirsts` for later use. We need to do this here since it's private.
+        InitializeTravelFirst();
+
+        IsInitialized = true;
+    }
+
+    /// <summary>
+    ///     When the game loads, build a cache of all the science regions for each celestial body.
+    ///     We are doing it here since we are using the private ScienceRegionsDataProvider class.
+    /// </summary>
+    private void InitializeScienceRegionsCache()
+    {
+        if (IsInitialized)
+        {
+            _Logger.LogInfo("Science regions cache already initialized, skipping");
+            return;
+        }
+
+        var dataProvider = GameManager.Instance.Game.ScienceManager.ScienceRegionsDataProvider;
 
         // Get the CelestialBodyScienceRegionsData dictionary, which is private.
         var cbToScienceRegions = typeof(ScienceRegionsDataProvider)
@@ -48,15 +71,47 @@ public class ArchiveManager
         }
 
         _Logger.LogInfo($"Found {CelestialBodiesScienceData.Count} celestial bodies with science regions");
-        IsInitialized = true;
     }
 
-    public ScienceRegionDefinition[] GetRegionsForBody(string bodyName)
+    /// <summary>
+    /// Reloads the private `TravelFirsts` class, which is used to check if a discoverable has been found.
+    /// We don't check to `IsInitialized` since it changes every time a new game is loaded.
+    /// </summary>
+    private void InitializeTravelFirst()
     {
-        if (CelestialBodiesScienceData.TryGetValue(bodyName, out var scienceData)) return scienceData.Regions;
+        var travelFirsts = typeof(TravelLogManager)
+            .GetField("_firsts", BindingFlags.NonPublic | BindingFlags.Instance)
+            ?.GetValue(GameManager.Instance.Game.TravelLogManager) as TravelFirsts;
+
+        if (travelFirsts == null)
+        {
+            _Logger.LogWarning("No TravelFirsts found, skipping");
+            return;
+        }
+
+        _firsts = travelFirsts;
+    }
+
+    /// <summary>
+    /// List of celestial bodies which have been reached by the player.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<string> GetCelestialBodiesNames(bool onlyDiscovered = false)
+    {
+        return CelestialBodiesScienceData.Keys.Where(cb => !onlyDiscovered || _firsts.SOIReached.ContainsKey(cb));
+    }
+
+    /// <summary>
+    /// All the science regions for a given celestial body.
+    /// This includes discoverable regions which have not been reached yet.
+    /// </summary>
+    public IEnumerable<ScienceRegionDefinition> GetRegionsForBody(string bodyName, bool onlyDiscovered = false)
+    {
+        if (CelestialBodiesScienceData.TryGetValue(bodyName, out var scienceData))
+            return scienceData.Regions.Where(r => !onlyDiscovered || _firsts.DiscoverableReached.ContainsKey(r.Id));
 
         _Logger.LogWarning($"No regions found for {bodyName}");
-        return new ScienceRegionDefinition[0];
+        return [];
     }
 
     public float GetScienceDifficultyMultiplier()

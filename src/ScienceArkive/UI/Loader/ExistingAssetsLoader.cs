@@ -11,11 +11,11 @@ namespace ScienceArkive.UI.Loader;
 /// </summary>
 public class ExistingAssetsLoader
 {
-    public Sprite SampleIcon { get; private set; }
-    public Sprite DataIcon { get; private set; }
-    public Sprite PlanetIcon { get; private set; }
-    public Sprite ScienceIcon { get; private set; }
-    public Sprite CheckIcon { get; private set; }
+    public Sprite? SampleIcon { get; private set; }
+    public Sprite? DataIcon { get; private set; }
+    public Sprite? PlanetIcon { get; private set; }
+    public Sprite? ScienceIcon { get; private set; }
+    public Sprite? CheckIcon { get; private set; }
 
     public string ResearchInventoryPrefabPath { get; set; } =
         "Assets/UI/Prefabs/Research Report Inventory/ResearchReport-Data.prefab";
@@ -64,9 +64,9 @@ public class ExistingAssetsLoader
                 GameObject.Find(BreadcrumbsControllerPath).GetComponent<BreadcrumbsController>();
             var breadcrumbsIcons = typeof(BreadcrumbsController)
                 .GetField("_breadcrumbsIcons", BindingFlags.NonPublic | BindingFlags.Instance)
-                ?.GetValue(breadcrumbsController) as Dictionary<BreadcrumbsType, Sprite>;
+                ?.GetValue(breadcrumbsController) as Dictionary<BreadcrumbsType, Sprite?>;
 
-            PlanetIcon = breadcrumbsIcons[BreadcrumbsType.Celestial];
+            PlanetIcon = breadcrumbsIcons?[BreadcrumbsType.Celestial];
 
             _isExistingLoaded = true;
         }
