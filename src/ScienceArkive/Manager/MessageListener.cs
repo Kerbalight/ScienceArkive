@@ -45,6 +45,7 @@ public class MessageListener
 
     private void OnVesselScienceSituationChangedMessage(MessageCenterMessage message)
     {
+        // Beware, this message is sent for every vessel, not just the active one.
         MainUIManager.Instance.ArchiveWindowController.Refresh();
     }
 

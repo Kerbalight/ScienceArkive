@@ -136,7 +136,7 @@ public class ScienceArchiveWindowController : MonoBehaviour
         _rootElement.transform.position = WindowPosition ?? _rootElement.transform.position;
         _planetListController.BuildPlanetList();
 
-        SelectedCelestialBody ??= GameManager.Instance.Game.UniverseModel.GetAllCelestialBodies()[0];
+        SelectedCelestialBody = SelectedCelestialBody ?? _planetListController.DisplayedBodies.First();
     }
 
     public void Refresh()

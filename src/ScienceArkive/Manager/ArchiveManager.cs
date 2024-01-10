@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using KSP.Game;
 using KSP.Game.Science;
 using KSP.Messages;
+using KSP.Modules;
 using KSP.Sim;
 using ScienceArkive.API.Extensions;
 using ScienceArkive.UI.Loader;
@@ -19,6 +20,7 @@ public class ArchiveManager
     public Dictionary<string, CelestialBodyScienceRegionsData> CelestialBodiesScienceData { get; private set; } = new();
 
     private TravelFirsts _firsts = null!;
+    private readonly List<string> _unlockedExperimentsIds = [];
 
 
     public void Initialize()
@@ -34,6 +36,8 @@ public class ArchiveManager
         InitializeScienceRegionsCache();
         // Save reference to `TravelFirsts` for later use. We need to do this here since it's private.
         InitializeTravelFirst();
+        // Save the list of unlocked experiments
+        InitializeUnlockedExperiments();
 
         IsInitialized = true;
     }
@@ -93,6 +97,38 @@ public class ArchiveManager
     }
 
     /// <summary>
+    /// Checks for all the experiments which are unlocked by the player.
+    /// Experiments are unlocked if a part which contains them is unlocked in the tech tree.
+    /// </summary>
+    private void InitializeUnlockedExperiments()
+    {
+        var experimentDataStore = GameManager.Instance.Game.ScienceManager.ScienceExperimentsDataStore;
+        var allExperimentIds =
+            experimentDataStore.GetAllExperimentIDs();
+
+        HashSet<string> availableExperimentIds = new();
+
+        // Get all the experiments from all the parts
+        var allParts = GameManager.Instance.Game.Parts.AllParts();
+        foreach (var part in allParts)
+        {
+            var scienceExperiment = part.GetSerializedModuleData<Data_ScienceExperiment>();
+            if (scienceExperiment == null) continue;
+            if (!SciencePartsHandler.Instance.IsPartUnlocked(part)) continue;
+
+            foreach (var experimentConfiguration in scienceExperiment.Experiments)
+            {
+                var expId = experimentConfiguration.ExperimentDefinitionID;
+                if (expId == null) continue;
+                availableExperimentIds.Add(expId);
+            }
+        }
+
+        _unlockedExperimentsIds.Clear();
+        _unlockedExperimentsIds.AddRange(availableExperimentIds);
+    }
+
+    /// <summary>
     /// List of celestial bodies which have been reached by the player.
     /// </summary>
     /// <returns></returns>
@@ -107,11 +143,39 @@ public class ArchiveManager
     /// </summary>
     public IEnumerable<ScienceRegionDefinition> GetRegionsForBody(string bodyName, bool onlyDiscovered = false)
     {
-        if (CelestialBodiesScienceData.TryGetValue(bodyName, out var scienceData))
-            return scienceData.Regions.Where(r => !onlyDiscovered || _firsts.DiscoverableReached.ContainsKey(r.Id));
+        if (!CelestialBodiesScienceData.TryGetValue(bodyName, out var scienceData))
+        {
+            _Logger.LogWarning($"No science data found for {bodyName}");
+            return [];
+        }
 
-        _Logger.LogWarning($"No regions found for {bodyName}");
-        return [];
+        if (!onlyDiscovered) return scienceData.Regions;
+
+        var scienceRegionsDataProvider = GameManager.Instance.Game.ScienceManager.ScienceRegionsDataProvider;
+        var regions = new List<ScienceRegionDefinition>();
+        foreach (var region in scienceData.Regions)
+            if (!scienceRegionsDataProvider.IsRegionADiscoverable(bodyName, region.Id) ||
+                _firsts.DiscoverableReached.ContainsKey($"{bodyName}_{region.Id}"))
+                regions.Add(region);
+
+        return regions;
+    }
+
+    public bool IsExperimentUnlocked(string experimentId)
+    {
+        return _unlockedExperimentsIds.Contains(experimentId);
+    }
+
+    public List<ExperimentDefinition> GetExperimentDefinitions(bool onlyUnlocked = false)
+    {
+        var experimentDataStore = GameManager.Instance.Game.ScienceManager.ScienceExperimentsDataStore;
+        var experimentIds = onlyUnlocked ? _unlockedExperimentsIds : experimentDataStore.GetAllExperimentIDs();
+
+        var experimentDefinitions = new List<ExperimentDefinition>();
+        foreach (var experimentId in experimentIds)
+            experimentDefinitions.Add(experimentDataStore.GetExperimentDefinition(experimentId));
+
+        return experimentDefinitions;
     }
 
     public float GetScienceDifficultyMultiplier()

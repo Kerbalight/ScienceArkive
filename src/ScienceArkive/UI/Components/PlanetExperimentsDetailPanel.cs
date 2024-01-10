@@ -44,29 +44,25 @@ public class PlanetExperimentsDetailPanel
 
         var gameInstance = GameManager.Instance.Game;
         var scienceDataStore = gameInstance.ScienceManager.ScienceExperimentsDataStore;
-        var allExperimentIds = scienceDataStore.GetAllExperimentIDs();
-        var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name, true);
+        // var allExperimentIds = scienceDataStore.GetAllExperimentIDs();
+        // var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name, true);
 
         gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports);
 
         // Available experiments
         var experiments = new List<ExperimentDefinition>();
-        foreach (var expId in allExperimentIds)
+        foreach (var experiment in ArchiveManager.Instance.GetExperimentDefinitions(true))
+        foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
         {
-            var experiment = scienceDataStore.GetExperimentDefinition(expId);
-            foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
-            {
-                var researchLocation = new ResearchLocation(true, celestialBody.Name, situation, "");
-                // This is not sufficient, we need to check if it's _possible_ to reach this location (es Kerbol_Splashed in invalid)
-                var isLocationValid = experiment.IsLocationValid(researchLocation, out var regionRequired);
-                var isFlavorPresent = isLocationValid && experiment.DataFlavorDescriptions.Any(flavor =>
-                    flavor.ResearchLocationID.StartsWith(researchLocation.ResearchLocationId));
-                if (isLocationValid && isFlavorPresent)
-                {
-                    experiments.Add(experiment);
-                    break;
-                }
-            }
+            var researchLocation = new ResearchLocation(true, celestialBody.Name, situation, "");
+            // This is not sufficient, we need to check if it's _possible_ to reach this location (es Kerbol_Splashed in invalid)
+            var isLocationValid = experiment.IsLocationValid(researchLocation, out var regionRequired);
+            var isFlavorPresent = isLocationValid && experiment.DataFlavorDescriptions.Any(flavor =>
+                flavor.ResearchLocationID.StartsWith(researchLocation.ResearchLocationId));
+            if (!isLocationValid || !isFlavorPresent) continue;
+
+            experiments.Add(experiment);
+            break;
         }
 
         // UI

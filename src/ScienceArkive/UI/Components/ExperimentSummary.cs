@@ -58,7 +58,7 @@ public class ExperimentSummary
 
             if (regionRequired)
             {
-                var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name);
+                var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name, true);
                 foreach (var region in regions)
                 {
                     var regionEntry = regionEntryTemplate.Instantiate();

@@ -15,6 +15,8 @@ public class PlanetListController
     private VisualElement _root;
     private VisualElement _planetsList;
 
+    public List<CelestialBodyComponent> DisplayedBodies { get; } = new();
+
     public event Action<CelestialBodyComponent>? PlanetSelected;
 
     public PlanetListController(VisualElement root)
@@ -33,6 +35,8 @@ public class PlanetListController
         var displayedBodiesNames = ArchiveManager.Instance.GetCelestialBodiesNames(true);
 
         _planetsList.Clear();
+        DisplayedBodies.Clear();
+
         var planetMenuItemTemplate = UIToolkitElement.Load("ScienceArchiveWindow/PlanetMenuItem.uxml");
         foreach (var celestialBody in celestialBodies)
         {
@@ -51,7 +55,9 @@ public class PlanetListController
 
             menuItem.Q<Button>("menu-button").RegisterCallback<ClickEvent>(_ => OnPlanetSelected(celestialBody));
             menuItem.style.height = 41;
+
             _planetsList.Add(menuItem);
+            DisplayedBodies.Add(celestialBody);
         }
     }
 
