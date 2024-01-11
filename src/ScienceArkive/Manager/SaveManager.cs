@@ -48,7 +48,7 @@ public class SaveManager
                 _Logger.LogWarning($"Could not find body {loadedSaveData.SelectedBody}");
         }
 
-        MainUIManager.Instance.ArchiveWindowController.BuildUI();
+        MainUIManager.Instance.ArchiveWindowController.ReloadAfterSaveLoad();
         loadedSaveData = null;
     }
 }

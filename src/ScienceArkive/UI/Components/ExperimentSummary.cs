@@ -15,6 +15,8 @@ public class ExperimentSummary
     private readonly VisualElement content;
     private readonly Foldout foldout;
 
+    private string _experimentId = null!;
+
     private ILogger logger;
 
     public ExperimentSummary(VisualElement visualElement)
@@ -22,12 +24,18 @@ public class ExperimentSummary
         logger = ScienceArkivePlugin.Instance.SWLogger;
 
         foldout = visualElement.Q<Foldout>("foldout-experiment");
+        foldout.RegisterValueChangedCallback(OnFoldoutChange);
         content = visualElement.Q<VisualElement>("content");
     }
 
     public void ToggleCollapse(bool shouldCollapse = true)
     {
         foldout.value = !shouldCollapse;
+    }
+
+    private void OnFoldoutChange(ChangeEvent<bool> evt)
+    {
+        MainUIManager.Instance.ArchiveWindowController.CollapsedExperiments[_experimentId] = evt.newValue;
     }
 
     public void BindExperiment(ExperimentDefinition experiment, CelestialBodyComponent celestialBody,
@@ -37,8 +45,12 @@ public class ExperimentSummary
         var dataStore = gameInstance.ScienceManager.ScienceExperimentsDataStore;
 
         var expId = experiment.ExperimentID;
+        _experimentId = expId;
 
         foldout.text = LocalizationManager.GetTranslation(dataStore.GetExperimentDisplayName(expId));
+        if (MainUIManager.Instance.ArchiveWindowController.CollapsedExperiments.TryGetValue(_experimentId,
+                out var isFolded))
+            foldout.value = isFolded;
 
         var situationLabelTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentSituationLabel.uxml");
         var regionEntryTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentRegionRow.uxml");

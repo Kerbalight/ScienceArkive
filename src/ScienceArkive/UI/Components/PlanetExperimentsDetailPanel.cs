@@ -10,7 +10,7 @@ namespace ScienceArkive.UI.Components;
 
 public class PlanetExperimentsDetailPanel
 {
-    private readonly VisualElement _detailScroll;
+    private readonly ScrollView _detailScroll;
     private readonly Label _nameLabel;
     private readonly VisualElement _experimentsList;
     private readonly VisualElement _root;
@@ -19,7 +19,8 @@ public class PlanetExperimentsDetailPanel
     public PlanetExperimentsDetailPanel(VisualElement root)
     {
         _root = root;
-        _detailScroll = _root.Q<VisualElement>("detail-scroll");
+        _detailScroll = _root.Q<ScrollView>("detail-scroll");
+        _detailScroll.verticalScroller.valueChanged += OnDetailScrollChange;
 
         _nameLabel = _root.Q<Label>("planet-name");
         _experimentsList = _root.Q<VisualElement>("experiments-container");
@@ -34,6 +35,11 @@ public class PlanetExperimentsDetailPanel
             var controller = experimentEntry.userData as ExperimentSummary;
             controller?.ToggleCollapse(shouldCollapse);
         }
+    }
+
+    private static void OnDetailScrollChange(float value)
+    {
+        MainUIManager.Instance.ArchiveWindowController.detailScrollPosition = value;
     }
 
     public void BindPlanet(CelestialBodyComponent? celestialBody)
@@ -69,6 +75,7 @@ public class PlanetExperimentsDetailPanel
 
         // UI
         _experimentsList.Clear();
+        _detailScroll.verticalScroller.value = MainUIManager.Instance.ArchiveWindowController.detailScrollPosition;
 
         var experimentTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentSummary.uxml");
         foreach (var experiment in experiments)

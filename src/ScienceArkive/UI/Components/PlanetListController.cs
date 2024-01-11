@@ -14,7 +14,7 @@ public class PlanetListController
     private static readonly ManualLogSource _Logger = Logger.CreateLogSource("ScienceArkive.PlanetListController");
 
     private VisualElement _root;
-    private VisualElement _planetsList;
+    private ScrollView _planetsList;
 
     public List<CelestialBodyComponent> DisplayedBodies { get; } = new();
 
@@ -23,19 +23,26 @@ public class PlanetListController
     public PlanetListController(VisualElement root)
     {
         _root = root;
-        _planetsList = _root.Q<VisualElement>("planet-list");
+        _planetsList = _root.Q<ScrollView>("planet-list");
+        _planetsList.verticalScroller.valueChanged += OnListVerticalScrollChange;
         _planetsList.Clear();
+    }
+
+    private static void OnListVerticalScrollChange(float value)
+    {
+        MainUIManager.Instance.ArchiveWindowController.planetsListScrollPosition = value;
     }
 
     public void BuildPlanetList()
     {
-        _Logger.LogInfo("building planet list");
+        _Logger.LogDebug("building planet list");
         var gameInstance = GameManager.Instance.Game;
         var celestialBodies = gameInstance.UniverseModel.GetAllCelestialBodies();
         var displayedBodiesNames =
             ArchiveManager.Instance.GetCelestialBodiesNames(Settings.ShowOnlyVisitedPlanets.Value).ToArray();
 
         _planetsList.Clear();
+        _planetsList.verticalScroller.value = MainUIManager.Instance.ArchiveWindowController.planetsListScrollPosition;
         DisplayedBodies.Clear();
 
         var planetMenuItemTemplate = UIToolkitElement.Load("ScienceArchiveWindow/PlanetMenuItem.uxml");

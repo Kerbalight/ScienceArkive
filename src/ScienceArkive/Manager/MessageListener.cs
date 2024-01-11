@@ -35,12 +35,12 @@ public class MessageListener
         // Build the science regions cache & check discoverables
         ArchiveManager.Instance.Initialize();
         // Refresh the UI
-        MainUIManager.Instance.ArchiveWindowController.BuildUI();
+        MainUIManager.Instance.Refresh();
     }
 
     private void OnResearchReportScoredMessage(MessageCenterMessage message)
     {
-        MainUIManager.Instance.ArchiveWindowController.Refresh();
+        MainUIManager.Instance.Refresh();
     }
 
     private void OnVesselScienceSituationChangedMessage(MessageCenterMessage message)

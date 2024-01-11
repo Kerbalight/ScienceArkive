@@ -20,8 +20,14 @@ public class ScienceArchiveWindowController : MonoBehaviour
     private static readonly ManualLogSource logger = Logger.CreateLogSource("ScienceArkive.ScienceArchiveWindow");
 
     private bool _isInitialized;
+
+    // UI State
     private bool _isWindowOpen;
     private CelestialBodyComponent? _selectedCelestialBody;
+    public Vector3? WindowPosition = null;
+    public readonly Dictionary<string, bool> CollapsedExperiments = new();
+    public float detailScrollPosition = 0f;
+    public float planetsListScrollPosition = 0f;
 
     public CelestialBodyComponent? SelectedCelestialBody
     {
@@ -41,7 +47,6 @@ public class ScienceArchiveWindowController : MonoBehaviour
 
     private UIDocument _window = null!;
 
-    public Vector3? WindowPosition = null;
 
     /// <summary>
     ///     The state of the window. Setting this value will open or close the window.
@@ -83,7 +88,7 @@ public class ScienceArchiveWindowController : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
-        logger.LogInfo("Enabling window");
+        logger.LogInfo("Enabling main window for the archive");
         _window = GetComponent<UIDocument>();
         _rootElement = _window.rootVisualElement[0];
         _rootElement.CenterByDefault();
@@ -97,7 +102,11 @@ public class ScienceArchiveWindowController : MonoBehaviour
         // Left pane
         var planetList = _rootElement.Q<VisualElement>("planet-list");
         _planetListController = new PlanetListController(planetList);
-        _planetListController.PlanetSelected += body => SelectedCelestialBody = body;
+        _planetListController.PlanetSelected += body =>
+        {
+            MainUIManager.Instance.ArchiveWindowController.detailScrollPosition = 0f;
+            SelectedCelestialBody = body;
+        };
 
         // Right pane
         var planetDetailTemplate = UIToolkitElement.Load("ScienceArchiveWindow/PlanetExperimentsDetailPanel.uxml");
@@ -116,7 +125,7 @@ public class ScienceArchiveWindowController : MonoBehaviour
     /// </summary>
     private void Initialize()
     {
-        logger.LogInfo("Initializing window (first display)");
+        logger.LogDebug("Initializing window (first display)");
         _isInitialized = true;
 
         _rootElement.Q<VisualElement>("planet-icon").style.backgroundImage =
@@ -127,22 +136,19 @@ public class ScienceArchiveWindowController : MonoBehaviour
 
     private void OnWindowDraggedPointerUp(PointerUpEvent evt)
     {
-        logger.LogDebug($"Window position updated {_rootElement.transform.position}");
         WindowPosition = _rootElement.transform.position;
     }
 
-    public void BuildUI()
+    public void ReloadAfterSaveLoad()
     {
-        logger.LogInfo("Building UI");
         _rootElement.transform.position = WindowPosition ?? _rootElement.transform.position;
-        _planetListController.BuildPlanetList();
-
-        SelectedCelestialBody = SelectedCelestialBody ?? _planetListController.DisplayedBodies.First();
+        Refresh();
     }
 
     public void Refresh()
     {
-        logger.LogInfo($"Refreshing window selected planet (body {SelectedCelestialBody?.DisplayName})");
-        if (SelectedCelestialBody != null) SelectedCelestialBody = SelectedCelestialBody;
+        logger.LogDebug($"Refreshing window selected planet (body {SelectedCelestialBody?.DisplayName})");
+        _planetListController.BuildPlanetList();
+        SelectedCelestialBody = SelectedCelestialBody ?? _planetListController.DisplayedBodies.First();
     }
 }
