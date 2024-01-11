@@ -26,6 +26,7 @@ public class MessageListener
         MessageCenter.PersistentSubscribe<ResearchReportScoredMessage>(OnResearchReportScoredMessage);
         MessageCenter.PersistentSubscribe<VesselScienceSituationChangedMessage>(OnVesselScienceSituationChangedMessage);
         MessageCenter.PersistentSubscribe<GameStateChangedMessage>(HideWindowOnInvalidState);
+        MessageCenter.PersistentSubscribe<TechTierUnlockedMessage>(OnTechTierUnlockedMessage);
     }
 
     private void OnGameLoadFinishedMessage(MessageCenterMessage message)
@@ -46,6 +47,16 @@ public class MessageListener
     private void OnVesselScienceSituationChangedMessage(MessageCenterMessage message)
     {
         // Beware, this message is sent for every vessel, not just the active one.
+        MainUIManager.Instance.ArchiveWindowController.Refresh();
+    }
+
+    /// <summary>
+    /// Reload the available experiments when a new tech tier is unlocked.
+    /// </summary>
+    /// <param name="message"></param>
+    private void OnTechTierUnlockedMessage(MessageCenterMessage message)
+    {
+        ArchiveManager.Instance.InitializeUnlockedExperiments();
         MainUIManager.Instance.ArchiveWindowController.Refresh();
     }
 

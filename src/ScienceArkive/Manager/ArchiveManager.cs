@@ -100,7 +100,7 @@ public class ArchiveManager
     /// Checks for all the experiments which are unlocked by the player.
     /// Experiments are unlocked if a part which contains them is unlocked in the tech tree.
     /// </summary>
-    private void InitializeUnlockedExperiments()
+    public void InitializeUnlockedExperiments()
     {
         var experimentDataStore = GameManager.Instance.Game.ScienceManager.ScienceExperimentsDataStore;
         var allExperimentIds =
