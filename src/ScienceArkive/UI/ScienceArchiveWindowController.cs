@@ -92,7 +92,7 @@ public class ScienceArchiveWindowController : MonoBehaviour
         _window = GetComponent<UIDocument>();
         _rootElement = _window.rootVisualElement[0];
         _rootElement.CenterByDefault();
-        _rootElement.StopWheelEventPropagation();
+        _rootElement.StopMouseEventsPropagation();
 
         IsWindowOpen = false;
 
