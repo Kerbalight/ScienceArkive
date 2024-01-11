@@ -106,7 +106,14 @@ public class ArchiveManager
         var allExperimentIds =
             experimentDataStore.GetAllExperimentIDs();
 
-        HashSet<string> availableExperimentIds = new();
+        // Get all the experiments from all the parts
+        HashSet<string> availableExperimentIds =
+        [
+            // EVA (always available)
+            "SurfaceSurvey",
+            "CrewReport"
+        ];
+
 
         // Get all the experiments from all the parts
         var allParts = GameManager.Instance.Game.Parts.AllParts();
