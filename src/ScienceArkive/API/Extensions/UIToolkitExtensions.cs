@@ -12,7 +12,8 @@ public static class UIToolkitExtensions
     public static GameInstance Game => GameManager.Instance.Game;
 
     /// <summary>
-    /// Stop the mouse events (scroll and click) from propagating to the game (e.g. zoom)
+    /// Stop the mouse events (scroll and click) from propagating to the game (e.g. zoom).
+    /// The only place where the Click still doesn't get stopped is in the MapView, neither the Focus or the Orbit mouse events.
     /// </summary>
     /// <param name="element"></param>
     public static void StopMouseEventsPropagation(this VisualElement element)
@@ -24,11 +25,11 @@ public static class UIToolkitExtensions
     private static void OnVisualElementPointerEnter(PointerEnterEvent evt)
     {
         Game.Input.Flight.CameraZoom.Disable();
-        Game.Input.Flight.Interact.Disable();
-        Game.Input.Flight.InteractAlt.Disable();
-        Game.Input.Flight.InteractAlt2.Disable();
+        Game.Input.Flight.mouseDoubleTap.Disable();
+        Game.Input.Flight.mouseSecondaryTap.Disable();
 
         Game.Input.MapView.cameraZoom.Disable();
+        Game.Input.MapView.Focus.Disable();
         Game.Input.MapView.mousePrimary.Disable();
         Game.Input.MapView.mouseSecondary.Disable();
         Game.Input.MapView.mouseTertiary.Disable();
@@ -42,11 +43,11 @@ public static class UIToolkitExtensions
     private static void OnVisualElementPointerLeave(PointerLeaveEvent evt)
     {
         Game.Input.Flight.CameraZoom.Enable();
-        Game.Input.Flight.Interact.Enable();
-        Game.Input.Flight.InteractAlt.Enable();
-        Game.Input.Flight.InteractAlt2.Enable();
+        Game.Input.Flight.mouseDoubleTap.Enable();
+        Game.Input.Flight.mouseSecondaryTap.Enable();
 
         Game.Input.MapView.cameraZoom.Enable();
+        Game.Input.MapView.Focus.Enable();
         Game.Input.MapView.mousePrimary.Enable();
         Game.Input.MapView.mouseSecondary.Enable();
         Game.Input.MapView.mouseTertiary.Enable();
