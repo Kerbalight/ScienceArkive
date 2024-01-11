@@ -75,8 +75,11 @@ public class ExperimentRegionRow
         //var flavorText = dataStore.GetFlavorText(expId, report.ResearchLocationID, report.ResearchReportType);
         var displayName = dataStore.GetExperimentDisplayName(expId);
         var requirements = dataStore.GetExperimentDisplayRequirements(expId);
+
+        // The region is visible if the region is visibile or anyway if atleast one report is present
+        // We need this second check because TravelFirst is not updated when we are here
         var isRegionVisible = ArchiveManager.Instance.IsRegionVisible(location.BodyName, location.ScienceRegion,
-            out var isRegionDiscoverable);
+            out var isRegionDiscoverable) || regionReports.Any();
 
         var reportName = dataStore.GetExperimentReportName(expId,
             experiment.ExperimentType == ScienceExperimentType.DataType
