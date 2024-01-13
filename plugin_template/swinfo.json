@@ -3,7 +3,7 @@
   "mod_id": "ScienceArkive",
   "author": "leonardfactory",
   "name": "Science Arkive",
-  "description": "",
+  "description": "See all science experiments in one place, browse by planet and region and check where you can gather more points",
   "source": "https://github.com/kerbalight/science-arkive",
   "version": "0.2.1",
   "version_check": "https://raw.githubusercontent.com/Kerbalight/ScienceArkive/main/plugin_template/swinfo.json",
