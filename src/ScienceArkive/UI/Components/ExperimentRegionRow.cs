@@ -14,6 +14,7 @@ public class ExperimentRegionRow
 {
     public ExperimentDefinition Experiment { get; private set; } = null!;
     public ResearchLocation Location { get; private set; } = null!;
+    public bool InRelatedContext { get; set; }
 
     private readonly VisualElement dataCheck;
 
@@ -64,10 +65,13 @@ public class ExperimentRegionRow
     }
 
     public void Bind(ExperimentDefinition experiment, ResearchLocation location,
-        IEnumerable<CompletedResearchReport> regionReports)
+        IEnumerable<CompletedResearchReport> allReports)
     {
         Experiment = experiment;
         Location = location;
+
+        var regionReports =
+            ArchiveManager.GetRegionAndExperimentReports(allReports, Location, Experiment.ExperimentID);
 
         var gameInstance = GameManager.Instance.Game;
         var dataStore = gameInstance.ScienceManager.ScienceExperimentsDataStore;
@@ -93,6 +97,13 @@ public class ExperimentRegionRow
             ? "???"
             : ScienceRegionsHelper.GetRegionDisplayName(location.ScienceRegion);
         regionLabel.tooltip = LocalizationManager.GetTranslation(requirements);
+
+        // Related experiments - add data report name to the region to differentiate
+        if (InRelatedContext)
+        {
+            var dataReportName = dataStore.GetExperimentReportName(expId, ScienceReportType.DataType);
+            regionLabel.text += " " + LocalizationManager.GetTranslation(dataReportName);
+        }
 
         // Sample
         var completedResearchReports = regionReports as CompletedResearchReport[] ?? regionReports.ToArray();

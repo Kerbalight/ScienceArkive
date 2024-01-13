@@ -65,12 +65,13 @@ public class PlanetExperimentsDetailPanel
         foreach (var experiment in displayedExperiments)
         foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
         {
+            //  we need to check if it's _possible_ to reach this location (es Kerbol_Splashed in invalid)
+            if (!ArchiveManager.Instance.ExistsBodyScienceSituation(celestialBody, situation)) continue;
+
             var researchLocation = new ResearchLocation(true, celestialBody.Name, situation, "");
-            // This is not sufficient, we need to check if it's _possible_ to reach this location (es Kerbol_Splashed in invalid)
+            // Then we need to check if the experiment is valid for this location
             var isLocationValid = experiment.IsLocationValid(researchLocation, out var regionRequired);
-            var isFlavorPresent = isLocationValid && experiment.DataFlavorDescriptions.Any(flavor =>
-                flavor.ResearchLocationID.StartsWith(researchLocation.ResearchLocationId));
-            if (!isLocationValid || !isFlavorPresent) continue;
+            if (!isLocationValid) continue;
 
             experiments.Add(experiment);
             break;

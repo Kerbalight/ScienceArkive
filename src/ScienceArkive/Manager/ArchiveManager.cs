@@ -5,6 +5,7 @@ using KSP.Game.Science;
 using KSP.Messages;
 using KSP.Modules;
 using KSP.Sim;
+using KSP.Sim.impl;
 using ScienceArkive.API.Extensions;
 using ScienceArkive.UI.Loader;
 
@@ -21,6 +22,14 @@ public class ArchiveManager
 
     private TravelFirsts _firsts = null!;
     private readonly List<string> _unlockedExperimentsIds = [];
+
+    /// <summary>
+    /// Dictionary of experiments which should be shown together in the same `ExperimentSummary` component.
+    /// This is used to group experiments which are similar, like Orbital Survey which provides
+    /// 25%, 50% and 100% experiments. (it's the same experiment, but triggered at different percentages
+    /// of scan completion).
+    /// </summary>
+    public Dictionary<string, List<ExperimentDefinition>> RelatedExperiments { get; } = new();
 
 
     public void Initialize()
@@ -110,8 +119,8 @@ public class ArchiveManager
         HashSet<string> availableExperimentIds =
         [
             // EVA (always available)
-            "SurfaceSurvey",
-            "CrewReport"
+            "SurfaceSurvey"
+            // "CrewReport" // Only for KSC? Not sure what to do with this one
         ];
 
 
@@ -133,6 +142,25 @@ public class ArchiveManager
 
         _unlockedExperimentsIds.Clear();
         _unlockedExperimentsIds.AddRange(availableExperimentIds);
+
+        // Group related experiments together
+        RelatedExperiments.Clear();
+        var visitedExperimentNames = new Dictionary<string, string>();
+        foreach (var experimentId in allExperimentIds)
+        {
+            var definition = experimentDataStore.GetExperimentDefinition(experimentId);
+            if (visitedExperimentNames.TryGetValue(definition.DisplayName, out var parentExpId))
+            {
+                if (!RelatedExperiments.ContainsKey(parentExpId))
+                    RelatedExperiments.Add(parentExpId, []);
+
+                RelatedExperiments[parentExpId].Add(definition);
+            }
+            else
+            {
+                visitedExperimentNames.Add(definition.DisplayName, experimentId);
+            }
+        }
     }
 
     /// <summary>
@@ -168,6 +196,32 @@ public class ArchiveManager
         return regions;
     }
 
+    /// <summary>
+    /// Checks if a Celestial Body permits the specified science situation.
+    /// </summary>
+    public bool ExistsBodyScienceSituation(CelestialBodyComponent body, ScienceSitutation situation)
+    {
+        switch (situation)
+        {
+            case ScienceSitutation.HighOrbit:
+            case ScienceSitutation.LowOrbit:
+                return true;
+
+            case ScienceSitutation.Atmosphere:
+                return body.hasAtmosphere;
+
+            case ScienceSitutation.Splashed:
+                return body.hasOcean;
+
+            case ScienceSitutation.Landed:
+                return body.hasSolidSurface;
+
+            case ScienceSitutation.None:
+            default:
+                return false;
+        }
+    }
+
     public bool IsRegionVisible(string bodyName, string regionId, out bool isDiscoverable)
     {
         var scienceRegionsDataProvider = GameManager.Instance.Game.ScienceManager.ScienceRegionsDataProvider;
@@ -188,7 +242,14 @@ public class ArchiveManager
 
         var experimentDefinitions = new List<ExperimentDefinition>();
         foreach (var experimentId in experimentIds)
-            experimentDefinitions.Add(experimentDataStore.GetExperimentDefinition(experimentId));
+        {
+            var definition = experimentDataStore.GetExperimentDefinition(experimentId);
+            if (experimentDefinitions.Any(d => d.DisplayName == definition.DisplayName))
+                // Related experiments are grouped together in the same `ExperimentSummary` component.
+                continue;
+
+            experimentDefinitions.Add(definition);
+        }
 
         return experimentDefinitions;
     }
@@ -200,6 +261,17 @@ public class ArchiveManager
                 out var scienceMultiplier)) scienceMultiplier = 1f;
 
         return scienceMultiplier;
+    }
+
+    public static IEnumerable<CompletedResearchReport> GetRegionAndExperimentReports(
+        IEnumerable<CompletedResearchReport> allReports, ResearchLocation location, string experimentId)
+    {
+        var reports = new List<CompletedResearchReport>();
+        foreach (var report in allReports)
+            if (report.ResearchLocationID == location.ResearchLocationId && report.ExperimentID == experimentId)
+                reports.Add(report);
+
+        return reports;
     }
 
     public void GetResearchLocationScalar(ResearchLocation location, out float scienceScalar)

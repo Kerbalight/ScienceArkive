@@ -61,12 +61,13 @@ public class ExperimentSummary
 
         foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
         {
+            // we need to check if it's _possible_ to reach this location (es Kerbol_Splashed in invalid)
+            if (!ArchiveManager.Instance.ExistsBodyScienceSituation(celestialBody, situation)) continue;
+
+            // Then we need to check if the experiment is valid for this location
             var researchLocation = new ResearchLocation(false, celestialBody.Name, situation, "");
-            // This is not sufficient, we need to check if it's _possible_ to reach this location (es Kerbol_Splashed in invalid)
             var isLocationValid = experiment.IsLocationValid(researchLocation, out var regionRequired);
-            var isFlavorPresent = isLocationValid && experiment.DataFlavorDescriptions.Any(flavor =>
-                flavor.ResearchLocationID.StartsWith(researchLocation.ResearchLocationId));
-            if (!isLocationValid || !isFlavorPresent) continue;
+            if (!isLocationValid) continue;
 
             var situationLabel = situationLabelTemplate.Instantiate();
             situationLabel.Q<Label>("situation-label").text =
@@ -92,8 +93,7 @@ public class ExperimentSummary
                         flavor.ResearchLocationID == regionResearchLocation.ResearchLocationId);
                     if (!isRegionFlavorPresent) continue;
 
-                    var regionReports = GetRegionAndExperimentReports(reports, regionResearchLocation, expId);
-                    regionController.Bind(experiment, regionResearchLocation, regionReports);
+                    regionController.Bind(experiment, regionResearchLocation, reports);
                     content.Add(regionEntry);
                 }
             }
@@ -102,24 +102,30 @@ public class ExperimentSummary
                 var regionEntry = regionEntryTemplate.Instantiate();
                 var regionController = new ExperimentRegionRow(regionEntry);
                 regionEntry.userData = regionController;
-                regionController.Bind(experiment, researchLocation,
-                    GetRegionAndExperimentReports(reports, researchLocation, expId));
+                regionController.Bind(experiment, researchLocation, reports);
                 content.Add(regionEntry);
+
+                // Related experiments. Used only for Orbital Survey (25%, 50%, 75%, 100%)
+                // TODO This is supported only for NO region required. We could support it for region required too, but there is no experiment which requires it
+                if (ArchiveManager.Instance.RelatedExperiments.TryGetValue(ExperimentId, out var relatedExperiments))
+                {
+                    regionController.InRelatedContext = true;
+
+                    foreach (var related in relatedExperiments)
+                    {
+                        var relatedEntry = regionEntryTemplate.Instantiate();
+                        var relatedController = new ExperimentRegionRow(relatedEntry);
+                        relatedEntry.userData = relatedController;
+
+                        relatedController.InRelatedContext = true;
+                        relatedController.Bind(related, researchLocation, reports);
+                        content.Add(relatedEntry);
+                    }
+                }
             }
         }
 
         Refresh(reports);
-    }
-
-    private IEnumerable<CompletedResearchReport> GetRegionAndExperimentReports(
-        IEnumerable<CompletedResearchReport> allReports, ResearchLocation location, string experimentId)
-    {
-        var reports = new List<CompletedResearchReport>();
-        foreach (var report in allReports)
-            if (report.ResearchLocationID == location.ResearchLocationId && report.ExperimentID == experimentId)
-                reports.Add(report);
-
-        return reports;
     }
 
     public void Refresh(List<CompletedResearchReport> reports)
@@ -136,8 +142,8 @@ public class ExperimentSummary
 
             if (!isVisible) continue;
 
-            var regionReports = GetRegionAndExperimentReports(reports, regionController.Location, ExperimentId);
-            regionController.Bind(regionController.Experiment, regionController.Location, regionReports);
+
+            regionController.Bind(regionController.Experiment, regionController.Location, reports);
         }
     }
 }
