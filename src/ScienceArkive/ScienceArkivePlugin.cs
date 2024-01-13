@@ -1,7 +1,9 @@
 using System.Reflection;
 using BepInEx;
+using HarmonyLib;
 using JetBrains.Annotations;
 using ScienceArkive.Manager;
+using ScienceArkive.Patches;
 using ScienceArkive.UI;
 using ScienceArkive.UI.Loader;
 using SpaceWarp;
@@ -75,6 +77,7 @@ public class ScienceArkivePlugin : BaseSpaceWarpPlugin
 
         // Patches
         //Harmony.CreateAndPatchAll(typeof(ScienceRegionsPatches));
+        Harmony.CreateAndPatchAll(typeof(FlightReportUIManagerPatches));
         ExistingAssetsLoader.Instance.StartLoadingPrefabAssets();
 
         // Messages subscribe

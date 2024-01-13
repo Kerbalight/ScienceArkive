@@ -193,7 +193,7 @@ public class ArchiveManager
         return experimentDefinitions;
     }
 
-    public float GetScienceDifficultyMultiplier()
+    public static float GetScienceDifficultyMultiplier()
     {
         var sessionManager = GameManager.Instance.Game.SessionManager;
         if (!sessionManager.TryGetDifficultyOptionState<float>("ScienceRewards",
