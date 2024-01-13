@@ -14,7 +14,7 @@ public class ExperimentSummary
 {
     private readonly VisualElement content;
     private readonly Foldout foldout;
-    private string _celestialBodyName;
+    private string _celestialBodyName = "";
 
     public string ExperimentId { get; private set; } = null!;
 
