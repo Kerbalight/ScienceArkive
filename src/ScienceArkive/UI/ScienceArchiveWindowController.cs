@@ -1,4 +1,5 @@
-﻿using BepInEx.Logging;
+﻿using System.Collections;
+using BepInEx.Logging;
 using JetBrains.Annotations;
 using KSP.Game;
 using KSP.Messages;
@@ -29,21 +30,24 @@ public class ScienceArchiveWindowController : MonoBehaviour
     public float detailScrollPosition = 0f;
     public float planetsListScrollPosition = 0f;
 
+    public bool IsDirty { get; set; }
+    private IEnumerator? _uiRefreshTask;
+
     public CelestialBodyComponent? SelectedCelestialBody
     {
         get => _selectedCelestialBody;
         set
         {
             _selectedCelestialBody = value;
-            _planetDetailController.BindPlanet(value);
-            _planetListController.SetSelectedCelestialBody(value);
+            PlanetExperimentsDetail.BindPlanet(value);
+            PlanetList.SetSelectedCelestialBody(value);
         }
     }
 
     private VisualElement _rootElement = null!;
     private VisualElement _detailElement = null!;
-    private PlanetListController _planetListController = null!;
-    private PlanetExperimentsDetailPanel _planetDetailController = null!;
+    public PlanetListController PlanetList { get; private set; } = null!;
+    public PlanetExperimentsDetailPanel PlanetExperimentsDetail { get; private set; } = null!;
 
     private UIDocument _window = null!;
 
@@ -64,6 +68,8 @@ public class ScienceArchiveWindowController : MonoBehaviour
 
             if (value && !_isInitialized) Initialize();
 
+            HandleRunRefreshTask();
+
             // Set the display style of the root element to show or hide the window
             _rootElement.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
             // Alternatively, you can deactivate the window game object to close the window and stop it from updating,
@@ -80,6 +86,46 @@ public class ScienceArchiveWindowController : MonoBehaviour
             GameObject.Find(ScienceArkivePlugin.ToolbarOabButtonID)
                 ?.GetComponent<UIValue_WriteBool_Toggle>()
                 ?.SetValue(value);
+        }
+    }
+
+    private void HandleRunRefreshTask()
+    {
+        switch (IsWindowOpen)
+        {
+            case true when _uiRefreshTask == null:
+                _uiRefreshTask = RunRefreshTask();
+                StartCoroutine(_uiRefreshTask);
+                break;
+            case false when _uiRefreshTask != null:
+                StopCoroutine(_uiRefreshTask);
+                _uiRefreshTask = null;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Updates the UI every periodically in background. Only if the window is open and
+    /// it is marked as dirty.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator RunRefreshTask()
+    {
+        while (true)
+        {
+            if (!IsWindowOpen)
+            {
+                logger.LogInfo("UI is closed, stopping refresh task.");
+                break;
+            }
+
+            if (IsDirty)
+            {
+                logger.LogDebug("Dirty UI: Refreshing");
+                Refresh();
+            }
+
+            yield return new WaitForSeconds(1);
         }
     }
 
@@ -101,8 +147,8 @@ public class ScienceArchiveWindowController : MonoBehaviour
 
         // Left pane
         var planetList = _rootElement.Q<VisualElement>("planet-list");
-        _planetListController = new PlanetListController(planetList);
-        _planetListController.PlanetSelected += body =>
+        PlanetList = new PlanetListController(planetList);
+        PlanetList.PlanetSelected += body =>
         {
             MainUIManager.Instance.ArchiveWindowController.detailScrollPosition = 0f;
             SelectedCelestialBody = body;
@@ -111,8 +157,8 @@ public class ScienceArchiveWindowController : MonoBehaviour
         // Right pane
         var planetDetailTemplate = UIToolkitElement.Load("ScienceArchiveWindow/PlanetExperimentsDetailPanel.uxml");
         _detailElement = planetDetailTemplate.Instantiate();
-        _planetDetailController = new PlanetExperimentsDetailPanel(_detailElement);
-        _detailElement.userData = _planetDetailController;
+        PlanetExperimentsDetail = new PlanetExperimentsDetailPanel(_detailElement);
+        _detailElement.userData = PlanetExperimentsDetail;
         _rootElement.Q<VisualElement>("main-content").Add(_detailElement);
 
         // Window drag
@@ -123,7 +169,7 @@ public class ScienceArchiveWindowController : MonoBehaviour
     ///     Initializes the window when it's first opened. This is done lazily to avoid
     ///     that assets are still not available.
     /// </summary>
-    private void Initialize()
+    public void Initialize()
     {
         logger.LogDebug("Initializing window (first display)");
         _isInitialized = true;
@@ -132,6 +178,9 @@ public class ScienceArchiveWindowController : MonoBehaviour
             new StyleBackground(ExistingAssetsLoader.Instance.PlanetIcon);
         _rootElement.Q<VisualElement>("window-icon").style.backgroundImage =
             new StyleBackground(ExistingAssetsLoader.Instance.ScienceIcon);
+
+        PlanetList.BuildPlanetList();
+        SelectedCelestialBody = PlanetList.DisplayedBodies.FirstOrDefault();
     }
 
     private void OnWindowDraggedPointerUp(PointerUpEvent evt)
@@ -142,13 +191,15 @@ public class ScienceArchiveWindowController : MonoBehaviour
     public void ReloadAfterSaveLoad()
     {
         _rootElement.transform.position = WindowPosition ?? _rootElement.transform.position;
+        SelectedCelestialBody = SelectedCelestialBody ?? PlanetList.DisplayedBodies.FirstOrDefault();
         Refresh();
     }
 
     public void Refresh()
     {
-        logger.LogDebug($"Refreshing window selected planet (body {SelectedCelestialBody?.DisplayName})");
-        _planetListController.BuildPlanetList();
-        SelectedCelestialBody = SelectedCelestialBody ?? _planetListController.DisplayedBodies.First();
+        IsDirty = false;
+
+        PlanetList.Refresh();
+        PlanetExperimentsDetail.Refresh();
     }
 }

@@ -15,6 +15,8 @@ public class PlanetExperimentsDetailPanel
     private readonly VisualElement _experimentsList;
     private readonly VisualElement _root;
     private CelestialBodyComponent? _celestialBody;
+    private Dictionary<string, bool> _visibleExperimentsIds = new();
+    private VisualTreeAsset _planetExperimentTemplate;
 
     public PlanetExperimentsDetailPanel(VisualElement root)
     {
@@ -26,6 +28,8 @@ public class PlanetExperimentsDetailPanel
         _experimentsList = _root.Q<VisualElement>("experiments-container");
 
         _root.Q<Button>("toggle-collapse-button").RegisterCallback<ClickEvent>(_ => { ToggleCollapse(); });
+
+        _planetExperimentTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentSummary.uxml");
     }
 
     public void ToggleCollapse(bool shouldCollapse = true)
@@ -56,8 +60,7 @@ public class PlanetExperimentsDetailPanel
         gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports);
 
         // Available experiments
-        var displayedExperiments = ArchiveManager.Instance.GetExperimentDefinitions(Settings.ShowOnlyUnlockedExperiments
-            .Value);
+        var displayedExperiments = ArchiveManager.Instance.GetExperimentDefinitions();
         var experiments = new List<ExperimentDefinition>();
         foreach (var experiment in displayedExperiments)
         foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
@@ -77,17 +80,44 @@ public class PlanetExperimentsDetailPanel
         _experimentsList.Clear();
         _detailScroll.verticalScroller.value = MainUIManager.Instance.ArchiveWindowController.detailScrollPosition;
 
-        var experimentTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentSummary.uxml");
         foreach (var experiment in experiments)
         {
-            var experimentEntry = experimentTemplate.Instantiate();
+            var experimentEntry = _planetExperimentTemplate.Instantiate();
             var experimentEntryController = new ExperimentSummary(experimentEntry);
             experimentEntryController.BindExperiment(experiment, celestialBody, completedReports);
             experimentEntry.userData = experimentEntryController;
+            experimentEntry.style.display = !Settings.ShowOnlyUnlockedExperiments.Value ||
+                                            ArchiveManager.Instance.IsExperimentUnlocked(experiment.ExperimentID)
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
             _experimentsList.Add(experimentEntry);
         }
 
         // UI Label
         _nameLabel.text = celestialBody.DisplayName;
+
+        Refresh();
+    }
+
+    /// <summary>
+    /// Refreshes the UI to show only the experiments that are unlocked.
+    /// If the body changes, we need to call BindPlanet() instead.
+    /// </summary>
+    public void Refresh()
+    {
+        var gameInstance = GameManager.Instance.Game;
+        gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports);
+
+        foreach (var experimentEntry in _experimentsList.Children())
+        {
+            if (experimentEntry.userData is not ExperimentSummary experimentEntryController) continue;
+
+            var expId = experimentEntryController.ExperimentId;
+            var isVisible = !Settings.ShowOnlyUnlockedExperiments.Value ||
+                            ArchiveManager.Instance.IsExperimentUnlocked(expId);
+            experimentEntry.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None;
+
+            if (isVisible) experimentEntryController.Refresh(completedReports);
+        }
     }
 }

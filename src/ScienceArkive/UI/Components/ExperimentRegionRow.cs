@@ -12,8 +12,9 @@ namespace ScienceArkive.UI;
 
 public class ExperimentRegionRow
 {
-    private ExperimentDefinition _experiment = null!;
-    private ResearchLocation _location = null!;
+    public ExperimentDefinition Experiment { get; private set; } = null!;
+    public ResearchLocation Location { get; private set; } = null!;
+
     private readonly VisualElement dataCheck;
 
     private readonly VisualElement dataContainer;
@@ -52,21 +53,21 @@ public class ExperimentRegionRow
 
     private float GetSampleValue()
     {
-        ArchiveManager.Instance.GetResearchLocationScalar(_location, out var scienceScalar);
-        return scienceScalar * _experiment.SampleValue;
+        ArchiveManager.Instance.GetResearchLocationScalar(Location, out var scienceScalar);
+        return scienceScalar * Experiment.SampleValue;
     }
 
     private float GetDataValue()
     {
-        ArchiveManager.Instance.GetResearchLocationScalar(_location, out var scienceScalar);
-        return scienceScalar * _experiment.DataValue;
+        ArchiveManager.Instance.GetResearchLocationScalar(Location, out var scienceScalar);
+        return scienceScalar * Experiment.DataValue;
     }
 
     public void Bind(ExperimentDefinition experiment, ResearchLocation location,
         IEnumerable<CompletedResearchReport> regionReports)
     {
-        _experiment = experiment;
-        _location = location;
+        Experiment = experiment;
+        Location = location;
 
         var gameInstance = GameManager.Instance.Game;
         var dataStore = gameInstance.ScienceManager.ScienceExperimentsDataStore;

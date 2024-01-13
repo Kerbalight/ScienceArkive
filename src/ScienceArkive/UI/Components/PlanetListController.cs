@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using HoudiniEngineUnity;
 using KSP.Game;
 using KSP.Sim.impl;
 using ScienceArkive.API.Extensions;
@@ -13,10 +14,24 @@ public class PlanetListController
 {
     private static readonly ManualLogSource _Logger = Logger.CreateLogSource("ScienceArkive.PlanetListController");
 
-    private VisualElement _root;
-    private ScrollView _planetsList;
+    private readonly VisualElement _root;
+    private readonly ScrollView _planetsList;
+    private readonly Dictionary<string, bool> _visibleBodies = new();
 
-    public List<CelestialBodyComponent> DisplayedBodies { get; } = new();
+    public List<CelestialBodyComponent> DisplayedBodies
+    {
+        get
+        {
+            var bodies = GameManager.Instance.Game.UniverseModel.GetAllCelestialBodies();
+            var visibleBodies = new List<CelestialBodyComponent>();
+            foreach (var body in bodies)
+                if (_visibleBodies.TryGetValue(body.Name, out var isVisible) && isVisible)
+                    visibleBodies.Add(body);
+
+            return visibleBodies;
+        }
+    }
+
 
     public event Action<CelestialBodyComponent>? PlanetSelected;
 
@@ -43,13 +58,10 @@ public class PlanetListController
 
         _planetsList.Clear();
         _planetsList.verticalScroller.value = MainUIManager.Instance.ArchiveWindowController.planetsListScrollPosition;
-        DisplayedBodies.Clear();
 
         var planetMenuItemTemplate = UIToolkitElement.Load("ScienceArchiveWindow/PlanetMenuItem.uxml");
         foreach (var celestialBody in celestialBodies)
         {
-            if (!celestialBody.isHomeWorld && !displayedBodiesNames.Contains(celestialBody.Name)) continue;
-
             var isStar = celestialBody.IsStar;
             var isMoon = celestialBody.referenceBody is { IsStar: false };
 
@@ -62,10 +74,28 @@ public class PlanetListController
                     new StyleBackground(ExistingAssetsLoader.Instance.PlanetIcon);
 
             menuItem.Q<Button>("menu-button").RegisterCallback<ClickEvent>(_ => OnPlanetSelected(celestialBody));
-            menuItem.style.height = 41;
+            menuItem.userData = celestialBody;
 
             _planetsList.Add(menuItem);
-            DisplayedBodies.Add(celestialBody);
+        }
+
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        var displayedBodiesNames =
+            ArchiveManager.Instance.GetCelestialBodiesNames(Settings.ShowOnlyVisitedPlanets.Value).ToArray();
+
+        foreach (var menuItem in _planetsList.Children())
+        {
+            if (menuItem.userData is not CelestialBodyComponent celestialBody) continue;
+
+            var isVisible = celestialBody.isHomeWorld || displayedBodiesNames.Contains(celestialBody.Name);
+
+            menuItem.style.height = isVisible ? 41 : 0;
+            menuItem.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None;
+            _visibleBodies[celestialBody.Name] = isVisible;
         }
     }
 

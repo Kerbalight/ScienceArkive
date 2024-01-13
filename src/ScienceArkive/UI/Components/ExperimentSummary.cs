@@ -14,8 +14,9 @@ public class ExperimentSummary
 {
     private readonly VisualElement content;
     private readonly Foldout foldout;
+    private string _celestialBodyName;
 
-    private string _experimentId = null!;
+    public string ExperimentId { get; private set; } = null!;
 
     private ILogger logger;
 
@@ -35,7 +36,7 @@ public class ExperimentSummary
 
     private void OnFoldoutChange(ChangeEvent<bool> evt)
     {
-        MainUIManager.Instance.ArchiveWindowController.CollapsedExperiments[_experimentId] = evt.newValue;
+        MainUIManager.Instance.ArchiveWindowController.CollapsedExperiments[ExperimentId] = evt.newValue;
     }
 
     public void BindExperiment(ExperimentDefinition experiment, CelestialBodyComponent celestialBody,
@@ -45,15 +46,18 @@ public class ExperimentSummary
         var dataStore = gameInstance.ScienceManager.ScienceExperimentsDataStore;
 
         var expId = experiment.ExperimentID;
-        _experimentId = expId;
+        ExperimentId = expId;
+        _celestialBodyName = celestialBody.Name;
 
         foldout.text = LocalizationManager.GetTranslation(dataStore.GetExperimentDisplayName(expId));
-        if (MainUIManager.Instance.ArchiveWindowController.CollapsedExperiments.TryGetValue(_experimentId,
+        if (MainUIManager.Instance.ArchiveWindowController.CollapsedExperiments.TryGetValue(ExperimentId,
                 out var isFolded))
             foldout.value = isFolded;
 
         var situationLabelTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentSituationLabel.uxml");
         var regionEntryTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentRegionRow.uxml");
+
+        var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name).ToArray();
 
         foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
         {
@@ -71,12 +75,11 @@ public class ExperimentSummary
 
             if (regionRequired)
             {
-                var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name,
-                    Settings.DiscoverablesDisplay.Value == Settings.DiscoverablesDisplayMode.Discovered);
                 foreach (var region in regions)
                 {
                     var regionEntry = regionEntryTemplate.Instantiate();
                     var regionController = new ExperimentRegionRow(regionEntry);
+                    regionEntry.userData = regionController;
                     var regionResearchLocation = new ResearchLocation(true, celestialBody.Name, situation, region.Id);
 
                     // This double check is not the cleanest. We use:
@@ -89,9 +92,7 @@ public class ExperimentSummary
                         flavor.ResearchLocationID == regionResearchLocation.ResearchLocationId);
                     if (!isRegionFlavorPresent) continue;
 
-                    var regionReports = reports.Where(r =>
-                        r.ResearchLocationID == regionResearchLocation.ResearchLocationId && r.ExperimentID == expId);
-
+                    var regionReports = GetRegionAndExperimentReports(reports, regionResearchLocation, expId);
                     regionController.Bind(experiment, regionResearchLocation, regionReports);
                     content.Add(regionEntry);
                 }
@@ -100,11 +101,43 @@ public class ExperimentSummary
             {
                 var regionEntry = regionEntryTemplate.Instantiate();
                 var regionController = new ExperimentRegionRow(regionEntry);
+                regionEntry.userData = regionController;
                 regionController.Bind(experiment, researchLocation,
-                    reports.Where(r =>
-                        r.ResearchLocationID == researchLocation.ResearchLocationId && r.ExperimentID == expId));
+                    GetRegionAndExperimentReports(reports, researchLocation, expId));
                 content.Add(regionEntry);
             }
+        }
+
+        Refresh(reports);
+    }
+
+    private IEnumerable<CompletedResearchReport> GetRegionAndExperimentReports(
+        IEnumerable<CompletedResearchReport> allReports, ResearchLocation location, string experimentId)
+    {
+        var reports = new List<CompletedResearchReport>();
+        foreach (var report in allReports)
+            if (report.ResearchLocationID == location.ResearchLocationId && report.ExperimentID == experimentId)
+                reports.Add(report);
+
+        return reports;
+    }
+
+    public void Refresh(List<CompletedResearchReport> reports)
+    {
+        var visibleRegions = ArchiveManager.Instance.GetRegionsForBody(_celestialBodyName,
+            Settings.DiscoverablesDisplay.Value == Settings.DiscoverablesDisplayMode.Discovered).ToArray();
+
+        foreach (var regionEntry in content.Children())
+        {
+            if (regionEntry.userData is not ExperimentRegionRow regionController) continue;
+            var isVisible = string.IsNullOrEmpty(regionController.Location.ScienceRegion) ||
+                            visibleRegions.Any(r => r.Id == regionController.Location.ScienceRegion);
+            regionEntry.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None;
+
+            if (!isVisible) continue;
+
+            var regionReports = GetRegionAndExperimentReports(reports, regionController.Location, ExperimentId);
+            regionController.Bind(regionController.Experiment, regionController.Location, regionReports);
         }
     }
 }

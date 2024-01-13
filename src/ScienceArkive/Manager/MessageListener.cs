@@ -35,33 +35,36 @@ public class MessageListener
         ExistingAssetsLoader.Instance.LoadAssetsFromExistingUI();
         // Build the science regions cache & check discoverables
         ArchiveManager.Instance.Initialize();
-        // Refresh the UI
+        // Rebuild the UI
+        MainUIManager.Instance.ArchiveWindowController.Initialize();
         MainUIManager.Instance.Refresh();
     }
 
-    private void OnResearchReportScoredMessage(MessageCenterMessage message)
+    private static void OnResearchReportScoredMessage(MessageCenterMessage message)
     {
-        MainUIManager.Instance.Refresh();
+        MainUIManager.Instance.ArchiveWindowController.IsDirty = true;
     }
 
-    private void OnVesselScienceSituationChangedMessage(MessageCenterMessage message)
+    private static void OnVesselScienceSituationChangedMessage(MessageCenterMessage message)
     {
         // Beware, this message is sent for every vessel, not just the active one.
-        MainUIManager.Instance.ArchiveWindowController.Refresh();
+        MainUIManager.Instance.ArchiveWindowController.IsDirty = true;
     }
 
     /// <summary>
     /// Reload the available experiments when a new tech tier is unlocked.
     /// </summary>
     /// <param name="message"></param>
-    private void OnTechTierUnlockedMessage(MessageCenterMessage message)
+    private static void OnTechTierUnlockedMessage(MessageCenterMessage message)
     {
         ArchiveManager.Instance.InitializeUnlockedExperiments();
-        MainUIManager.Instance.ArchiveWindowController.Refresh();
+        MainUIManager.Instance.ArchiveWindowController.IsDirty = true;
     }
 
     private void HideWindowOnInvalidState(MessageCenterMessage message)
     {
-        if (GameStateManager.Instance.IsInvalidState()) MainUIManager.Instance.ToggleUI(false);
+        if (GameStateManager.Instance.IsInvalidState())
+            // Close the windows if the game is in an invalid state
+            MainUIManager.Instance.ToggleUI(false);
     }
 }
