@@ -1,0 +1,4 @@
+Key,Type,Desc,English,German,French,Italian,Spanish,Japanese,Korean,Polish,Russian,Chinese (Simplified),Portuguese (Brazil),Chinese (Traditional)
+ScienceArkive/UI/ExperimentsArchive,Text,Should always be in uppercase since it is used in the title,EXPERIMENTS ARCHIVE,,,ARCHIVIO ESPERIMENTI,,,,,,,,
+ScienceArkive/UI/CollapseAll,Text,,Collapse all,,,Riduci tutti,,,,,,,,
+ScienceArkive/UI/TotalSciencePoints,Text,,Total Science Points:,,,Punti Scienza Totali:,,,,,,,,

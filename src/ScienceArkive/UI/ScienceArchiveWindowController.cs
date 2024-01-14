@@ -119,11 +119,7 @@ public class ScienceArchiveWindowController : MonoBehaviour
                 break;
             }
 
-            if (IsDirty)
-            {
-                logger.LogDebug("Dirty UI: Refreshing");
-                Refresh();
-            }
+            if (IsDirty) Refresh();
 
             yield return new WaitForSeconds(1);
         }
@@ -136,6 +132,7 @@ public class ScienceArchiveWindowController : MonoBehaviour
     {
         logger.LogInfo("Enabling main window for the archive");
         _window = GetComponent<UIDocument>();
+
         _rootElement = _window.rootVisualElement[0];
         _rootElement.CenterByDefault();
         _rootElement.StopMouseEventsPropagation();
@@ -163,6 +160,9 @@ public class ScienceArchiveWindowController : MonoBehaviour
 
         // Window drag
         _rootElement.RegisterCallback<PointerUpEvent>(OnWindowDraggedPointerUp);
+
+        // Localization
+        _window.EnableLocalization();
     }
 
     /// <summary>

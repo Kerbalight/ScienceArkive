@@ -4,7 +4,7 @@
         <ui:VisualElement name="title-bar" style="height: auto; margin-bottom: 2px; margin-top: 2px;">
             <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-start; align-self: center;">
                 <ui:VisualElement name="window-icon" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; justify-content: flex-start; align-self: center; margin-right: 8px;" />
-                <ui:Label tabindex="-1" text="EXPERIMENTS ARCHIVE" display-tooltip-when-elided="true" class="font-pixel-label" style="font-size: 14px;" />
+                <ui:Label tabindex="-1" text="#ScienceArkive/UI/ExperimentsArchive" display-tooltip-when-elided="true" class="font-pixel-label" style="font-size: 14px;" />
             </ui:VisualElement>
             <ui:Button text="×" display-tooltip-when-elided="true" name="close-button" style="font-size: 24px; width: 24px; height: 24px; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0;" />
         </ui:VisualElement>

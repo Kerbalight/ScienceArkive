@@ -2,6 +2,7 @@
 using KSP.Game.Science;
 using KSP.Sim.impl;
 using ScienceArkive.API.Extensions;
+using ScienceArkive.Data;
 using ScienceArkive.Manager;
 using ScienceArkive.Utils;
 using UnityEngine.UIElements;
@@ -15,6 +16,7 @@ public class PlanetExperimentsDetailPanel
     private readonly VisualElement _experimentsList;
     private readonly VisualElement _root;
     private readonly ProgressBar _progressBar;
+    private readonly Button _collapseButton;
     private CelestialBodyComponent? _celestialBody;
     private Dictionary<string, bool> _visibleExperimentsIds = new();
     private VisualTreeAsset _planetExperimentTemplate;
@@ -33,7 +35,8 @@ public class PlanetExperimentsDetailPanel
 
         _progressBar = _root.Q<ProgressBar>("discover-progress");
 
-        _root.Q<Button>("toggle-collapse-button").RegisterCallback<ClickEvent>(_ => { ToggleCollapse(); });
+        _collapseButton = _root.Q<Button>("toggle-collapse-button");
+        _collapseButton.RegisterCallback<ClickEvent>(_ => { ToggleCollapse(); });
 
         _planetExperimentTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentSummary.uxml");
     }

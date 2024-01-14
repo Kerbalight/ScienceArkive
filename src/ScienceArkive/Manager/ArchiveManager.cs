@@ -143,6 +143,8 @@ public class ArchiveManager
         _unlockedExperimentsIds.Clear();
         _unlockedExperimentsIds.AddRange(availableExperimentIds);
 
+        _Logger.LogInfo("Found " + _unlockedExperimentsIds.Count + " unlocked experiments");
+
         // Group related experiments together
         RelatedExperiments.Clear();
         var visitedExperimentNames = new Dictionary<string, string>();
@@ -161,6 +163,8 @@ public class ArchiveManager
                 visitedExperimentNames.Add(definition.DisplayName, experimentId);
             }
         }
+
+        _Logger.LogInfo("Found " + RelatedExperiments.Count + " related experiments");
     }
 
     /// <summary>

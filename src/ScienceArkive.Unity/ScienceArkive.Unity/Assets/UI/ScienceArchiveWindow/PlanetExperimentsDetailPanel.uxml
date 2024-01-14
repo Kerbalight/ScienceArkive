@@ -8,7 +8,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="right-actions" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-self: center; justify-content: flex-end; align-items: center;">
                 <ui:ProgressBar value="0" name="discover-progress" title="0%" class="progress" style="width: 120px; margin-right: 12px;" />
-                <ui:Button text="Collapse All" display-tooltip-when-elided="true" name="toggle-collapse-button" />
+                <ui:Button text="#ScienceArkive/UI/CollapseAll" display-tooltip-when-elided="true" name="toggle-collapse-button" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="detail-scroll" style="min-width: 350px; min-height: 350px;">
