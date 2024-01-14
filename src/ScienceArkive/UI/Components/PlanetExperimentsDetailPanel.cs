@@ -80,7 +80,8 @@ public class PlanetExperimentsDetailPanel
         // var allExperimentIds = scienceDataStore.GetAllExperimentIDs();
         // var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name, true);
 
-        gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports);
+        if (!gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports))
+            completedReports = [];
 
         // Available experiments
         var displayedExperiments = ArchiveManager.Instance.GetExperimentDefinitions();
@@ -132,7 +133,8 @@ public class PlanetExperimentsDetailPanel
         ClearDiscoverProgress();
 
         var gameInstance = GameManager.Instance.Game;
-        gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports);
+        if (!gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports))
+            completedReports = [];
 
         foreach (var experimentEntry in _experimentsList.Children())
         {

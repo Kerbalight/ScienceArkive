@@ -256,6 +256,8 @@ public class ArchiveManager
 
     public static float GetScienceDifficultyMultiplier()
     {
+        if (!SciencePartsHandler.Instance.IsGameModeSciencePointsFeatureEnabled()) return 1f;
+
         var sessionManager = GameManager.Instance.Game.SessionManager;
         if (!sessionManager.TryGetDifficultyOptionState<float>("ScienceRewards",
                 out var scienceMultiplier)) scienceMultiplier = 1f;
@@ -264,9 +266,11 @@ public class ArchiveManager
     }
 
     public static IEnumerable<CompletedResearchReport> GetRegionAndExperimentReports(
-        IEnumerable<CompletedResearchReport> allReports, ResearchLocation location, string experimentId)
+        IEnumerable<CompletedResearchReport>? allReports, ResearchLocation location, string experimentId)
     {
         var reports = new List<CompletedResearchReport>();
+        if (allReports == null) return reports;
+
         foreach (var report in allReports)
             if (report.ResearchLocationID == location.ResearchLocationId && report.ExperimentID == experimentId)
                 reports.Add(report);

@@ -21,6 +21,11 @@ public class SciencePartsHandler
         return GameManager.Instance.GameModeManager.IsGameModeFeatureEnabled(featureId);
     }
 
+    public bool IsGameModeSciencePointsFeatureEnabled()
+    {
+        return IsGameModeFeatureEnabled("SciencePoints");
+    }
+
     public bool IsPartUnlocked(PartCore part)
     {
         if (!IsGameModeFeatureEnabled("SciencePartUnlock")) return true;
