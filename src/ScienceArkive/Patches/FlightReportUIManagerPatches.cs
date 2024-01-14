@@ -10,6 +10,7 @@ using ScienceArkive.UI.Loader;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UI.Extensions;
 
 namespace ScienceArkive.Patches;
 
@@ -48,6 +49,8 @@ public class FlightReportUIManagerPatches
         var cachedReports = _scienceReportsCache[vesselMessage.VesselID];
         if (cachedReports == null) return;
 
+        var totalScienceValue = 0f;
+
         foreach (var reportDisplayBag in _scienceReportsCache[vesselMessage.VesselID])
         {
             var flightReportResearchItem = ____researchItemPool.FetchInstance();
@@ -59,29 +62,61 @@ public class FlightReportUIManagerPatches
                 reportDisplayBag.CelestialBodyName +
                 "</color> / " + reportDisplayBag.ResearchLocationName + "</uppercase></size>",
                 (int)reportDisplayBag.ScienceValue);
-            flightReportResearchItem.GetComponent<RectTransform>().localScale = Vector3.one;
+
+            totalScienceValue += reportDisplayBag.ScienceValue;
 
             // UI Fixes
-            var horizontalLayoutGroup = flightReportResearchItem.GetComponent<HorizontalLayoutGroup>();
-            horizontalLayoutGroup.childForceExpandWidth = false;
-            horizontalLayoutGroup.spacing = 12;
-
-            var icon = flightReportResearchItem.transform.Find("Icon");
-            icon.GetComponent<RectTransform>().sizeDelta = new Vector2(20, 20);
-            icon.GetComponent<Image>().color = new Color(0.6666667f, 0.6784314f, 1, 1);
-
-            flightReportResearchItem.transform.Find("Background").GetComponent<Graphic>().color = new Color(0, 0, 0, 0);
-
-            var entryTitle = flightReportResearchItem.transform.Find("Entry Title").GetComponent<TextMeshProUGUI>();
-            entryTitle.fontSize = 16;
-            entryTitle.horizontalAlignment = HorizontalAlignmentOptions.Left;
-            entryTitle.autoSizeTextContainer = true; // 0.6666667 0.6784314 1 1 color
-            entryTitle.color = new Color(0.6666667f, 0.6784314f, 1, 1);
-
+            FixFlightReportResearchItemUIStyle(flightReportResearchItem);
 
             ____researchItems.Add(flightReportResearchItem);
         }
 
+        // Add total science value
+        var totalScienceValueItem = ____researchItemPool.FetchInstance();
+        totalScienceValueItem.transform.SetParent(____researchParentTransform, true);
+        totalScienceValueItem.Initialize(ExistingAssetsLoader.Instance.ScienceIcon,
+            $"<uppercase>{LocalizedStrings.TotalSciencePoints}</uppercase>",
+            (int)totalScienceValue);
+        FixFlightReportResearchItemUIStyle(totalScienceValueItem);
+        ____researchItems.Add(totalScienceValueItem);
+
+        // Cleanup
         _scienceReportsCache.Remove(vesselMessage.VesselID);
+    }
+
+    private static void FixFlightReportResearchItemUIStyle(FlightReportResearchItem flightReportResearchItem)
+    {
+        flightReportResearchItem.GetComponent<RectTransform>().localScale = Vector3.one;
+
+        var horizontalLayoutGroup = flightReportResearchItem.GetComponent<HorizontalLayoutGroup>();
+        horizontalLayoutGroup.childControlHeight = true;
+        horizontalLayoutGroup.childControlWidth = true;
+        horizontalLayoutGroup.childForceExpandWidth = false;
+        horizontalLayoutGroup.childForceExpandHeight = true;
+        horizontalLayoutGroup.spacing = 8;
+        horizontalLayoutGroup.padding = new RectOffset(10, 10, 0, 0);
+
+        var icon = flightReportResearchItem.transform.Find("Icon");
+        icon.GetComponent<RectTransform>().sizeDelta = new Vector2(20, 20);
+        var iconImage = icon.GetComponent<Image>();
+        iconImage.color = new Color(0.6666667f, 0.6784314f, 1, 1);
+        iconImage.preserveAspect = true;
+        var layoutElement = icon.gameObject.GetOrAddComponent<LayoutElement>();
+        layoutElement.flexibleWidth = 0;
+        layoutElement.preferredWidth = 20;
+
+        var background = flightReportResearchItem.transform.Find("Background");
+        background.GetComponent<Graphic>().color = new Color(0, 0, 0, 0);
+
+        var entryTitle = flightReportResearchItem.transform.Find("Entry Title").GetComponent<TextMeshProUGUI>();
+        entryTitle.fontSize = 16;
+        entryTitle.horizontalAlignment = HorizontalAlignmentOptions.Left;
+        entryTitle.autoSizeTextContainer = true; // 0.6666667 0.6784314 1 1 color
+        entryTitle.color = new Color(0.6666667f, 0.6784314f, 1, 1);
+        var entryTitleLayoutElement = entryTitle.gameObject.AddComponent<LayoutElement>();
+        entryTitleLayoutElement.flexibleWidth = 1;
+        var entryTitleContentFitter = entryTitle.GetComponent<ContentSizeFitter>();
+        entryTitleContentFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        entryTitleContentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
     }
 }
