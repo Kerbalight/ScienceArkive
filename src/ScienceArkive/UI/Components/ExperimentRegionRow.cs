@@ -115,7 +115,12 @@ public class ExperimentRegionRow
                 .Cast<CompletedResearchReport?>().FirstOrDefault();
             sampleIcon.style.unityBackgroundImageTintColor = sampleReport == null ? Color.white : Color.cyan;
             sampleCheck.style.visibility = sampleReport == null ? Visibility.Hidden : Visibility.Visible;
-            sampleScienceLabel.text = GetSampleValue().ToString("0.00");
+
+            var sampleValue = GetSampleValue();
+            sampleScienceLabel.text = sampleValue.ToString("0.00");
+
+            MainUIManager.Instance.ArchiveWindowController.PlanetExperimentsDetail.UpdateDiscoverProgress(sampleValue,
+                sampleReport?.FinalScienceValue ?? 0f);
         }
         else
         {
@@ -131,7 +136,12 @@ public class ExperimentRegionRow
                 .Cast<CompletedResearchReport?>().FirstOrDefault();
             dataIcon.style.unityBackgroundImageTintColor = dataReport == null ? Color.white : Color.cyan;
             dataCheck.style.visibility = dataReport == null ? Visibility.Hidden : Visibility.Visible;
-            dataScienceLabel.text = GetDataValue().ToString("0.00");
+
+            var dataValue = GetDataValue();
+            dataScienceLabel.text = dataValue.ToString("0.00");
+
+            MainUIManager.Instance.ArchiveWindowController.PlanetExperimentsDetail.UpdateDiscoverProgress(dataValue,
+                dataReport?.FinalScienceValue ?? 0f);
 
             if (dataReport.HasValue && Math.Abs(dataReport.Value.FinalScienceValue - GetDataValue()) > 1E-5f)
                 logger.LogWarning(

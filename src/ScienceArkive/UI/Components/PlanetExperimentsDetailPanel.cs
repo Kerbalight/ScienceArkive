@@ -14,9 +14,13 @@ public class PlanetExperimentsDetailPanel
     private readonly Label _nameLabel;
     private readonly VisualElement _experimentsList;
     private readonly VisualElement _root;
+    private readonly ProgressBar _progressBar;
     private CelestialBodyComponent? _celestialBody;
     private Dictionary<string, bool> _visibleExperimentsIds = new();
     private VisualTreeAsset _planetExperimentTemplate;
+
+    private float _sciencePoints = 0f;
+    private float _maxSciencePoints = 0f;
 
     public PlanetExperimentsDetailPanel(VisualElement root)
     {
@@ -26,6 +30,8 @@ public class PlanetExperimentsDetailPanel
 
         _nameLabel = _root.Q<Label>("planet-name");
         _experimentsList = _root.Q<VisualElement>("experiments-container");
+
+        _progressBar = _root.Q<ProgressBar>("discover-progress");
 
         _root.Q<Button>("toggle-collapse-button").RegisterCallback<ClickEvent>(_ => { ToggleCollapse(); });
 
@@ -46,11 +52,28 @@ public class PlanetExperimentsDetailPanel
         MainUIManager.Instance.ArchiveWindowController.detailScrollPosition = value;
     }
 
+    private void ClearDiscoverProgress()
+    {
+        _sciencePoints = 0f;
+        _maxSciencePoints = 0f;
+        _progressBar.value = 0f;
+        _progressBar.title = "0%";
+    }
+
+    public void UpdateDiscoverProgress(float potential, float scored)
+    {
+        _sciencePoints += scored;
+        _maxSciencePoints += potential;
+        _progressBar.value = _sciencePoints / _maxSciencePoints;
+        _progressBar.title = (_progressBar.value * 100).ToString("0.0") + "%";
+    }
+
     public void BindPlanet(CelestialBodyComponent? celestialBody)
     {
         if (celestialBody == null) return;
 
         _celestialBody = celestialBody;
+        ClearDiscoverProgress();
 
         var gameInstance = GameManager.Instance.Game;
         var scienceDataStore = gameInstance.ScienceManager.ScienceExperimentsDataStore;
@@ -106,6 +129,8 @@ public class PlanetExperimentsDetailPanel
     /// </summary>
     public void Refresh()
     {
+        ClearDiscoverProgress();
+
         var gameInstance = GameManager.Instance.Game;
         gameInstance.SessionManager.TryGetMyAgencySubmittedResearchReports(out var completedReports);
 
