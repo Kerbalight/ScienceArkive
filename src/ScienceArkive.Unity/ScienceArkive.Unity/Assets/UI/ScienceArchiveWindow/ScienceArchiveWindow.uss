@@ -40,7 +40,7 @@
 }
 
 .menu-item__selected {
-	background-color: rgba(70, 62, 125, 0.8);
+    background-color: rgba(70, 62, 125, 0.8);
 }
 
 .menu-item-border {
@@ -49,4 +49,16 @@
     background-size: auto;
     background-repeat: repeat;
     -unity-background-image-tint-color: rgb(154, 155, 183);
+}
+
+.font-mono-label {
+    -unity-font-definition: var(--font-medium);
+}
+
+#situation-label {
+    -unity-font-definition: var(--font-title-big);
+}
+
+.font-pixel-label {
+    -unity-font-definition: var(--font-title-big);
 }

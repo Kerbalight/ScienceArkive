@@ -3,7 +3,7 @@
     <ui:VisualElement>
         <ui:VisualElement class="experiment-item" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); align-items: center;">
             <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="name-label" style="flex-grow: 1; display: none;" />
-            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="region-label" style="color: rgb(170, 178, 195); flex-grow: 1; -unity-font-definition: url(&apos;project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/JetBrainsMono/JetBrainsMono-Regular%20SDF.asset?fileID=11400000&amp;guid=f5454c9c675002c44a5a7234bd40c390&amp;type=2#JetBrainsMono-Regular SDF&apos;);" />
+            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="region-label" class="font-mono-label" style="color: rgb(170, 178, 195); flex-grow: 1;" />
             <ui:VisualElement name="sample" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-direction: row; padding-right: 6px; padding-left: 6px; padding-top: 4px; padding-bottom: 4px; align-self: center;">
                 <ui:VisualElement name="sample-icon" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; flex-shrink: 0; margin-right: 6px;" />
                 <ui:Label tabindex="-1" text="1400.0" display-tooltip-when-elided="true" name="sample-science" style="font-size: 11px; padding-right: 2px; padding-top: 0; padding-bottom: 0; padding-left: 4px; color: rgb(255, 255, 255); width: 50px;" />
