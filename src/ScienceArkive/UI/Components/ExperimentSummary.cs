@@ -102,11 +102,16 @@ public class ExperimentSummary
                     var regionResearchLocation = new ResearchLocation(true, celestialBody.Name, situation, region.Id);
                     if (!experiment.IsLocationValid(regionResearchLocation, out _)) continue;
 
+                    // Skip experiments which are not available in this region. E.g. OrbitalSurvey_LowOrbit_<Discoverable>
+                    if (ArchiveManager.Instance.ShouldSkipExperimentInResearchLocation(experiment,
+                            regionResearchLocation)) continue;
+
                     // We previously checked the DataFlavorDescriptions, since we only want to show locations which has been validated by devs, but it appears sometimes they're missing
                     // So we use the ResearchLocationScalar, since we want to omit negative values (es. Kerbin_Beach_Splashed: technically _there is a flavor text_, even if the science is negative)
                     // We should probably double check how KSP2 does it by itself
                     ArchiveManager.Instance.GetResearchLocationScalar(regionResearchLocation, out var scienceScalar);
                     if (scienceScalar < 0f) continue;
+
 
                     regionController.Bind(experiment, regionResearchLocation, reports);
                     content.Add(regionEntry);

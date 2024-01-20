@@ -234,6 +234,20 @@ public class ArchiveManager
                _firsts.DiscoverableReached.ContainsKey($"{bodyName}_{regionId}");
     }
 
+    /// <summary>
+    /// Some experiments are not available in certain locations. We could not use `IsLocationValid` since it
+    /// doesn't check for discoverables.
+    /// </summary>
+    public bool ShouldSkipExperimentInResearchLocation(ExperimentDefinition definition, ResearchLocation location)
+    {
+        var scienceRegionsDataProvider = GameManager.Instance.Game.ScienceManager.ScienceRegionsDataProvider;
+        if (location.ScienceSituation == ScienceSitutation.LowOrbit &&
+            scienceRegionsDataProvider.IsRegionADiscoverable(location.BodyName, location.ScienceRegion))
+            return true;
+
+        return false;
+    }
+
     public bool IsExperimentUnlocked(string experimentId)
     {
         return _unlockedExperimentsIds.Contains(experimentId);
