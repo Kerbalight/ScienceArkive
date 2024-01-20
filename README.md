@@ -4,7 +4,7 @@ See all science experiments in one place, browse by planet and region and check 
 
 Plus, it restores the missing "Research" panel in the stock Vessel Recovered window!
 
-![Science Arkive in game screen](public/science-arkive-banner.png)
+![Science Arkive in game screen](public/science-arkive-banner-big.png)
 
 ---
 
