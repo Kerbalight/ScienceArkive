@@ -67,8 +67,8 @@ public class PlanetExperimentsDetailPanel
     {
         _sciencePoints += scored;
         _maxSciencePoints += potential;
-        _progressBar.value = _sciencePoints / _maxSciencePoints;
-        _progressBar.title = (_progressBar.value * 100).ToString("0.0") + "%";
+        _progressBar.value = _sciencePoints / _maxSciencePoints * 100;
+        _progressBar.title = _progressBar.value.ToString("0.0") + "%";
     }
 
     public void BindPlanet(CelestialBodyComponent? celestialBody)
