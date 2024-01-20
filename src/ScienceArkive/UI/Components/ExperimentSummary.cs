@@ -67,7 +67,25 @@ public class ExperimentSummary
             // Then we need to check if the experiment is valid for this location
             var researchLocation = new ResearchLocation(false, celestialBody.Name, situation, "");
             var isLocationValid = experiment.IsLocationValid(researchLocation, out var regionRequired);
-            if (!isLocationValid) continue;
+            if (!isLocationValid)
+            {
+                // If the experiment requires a region, we need to check if there is at least one valid region.
+                // The no-region check could still produce false, since the experiment could be valid only for specific
+                // regions
+                var isAnyRegionValid = false;
+                foreach (var region in regions)
+                {
+                    var regionResearchLocation = new ResearchLocation(true, celestialBody.Name, situation, region.Id);
+                    if (experiment.IsLocationValid(regionResearchLocation, out _))
+                    {
+                        isAnyRegionValid = true;
+                        regionRequired = true;
+                        break;
+                    }
+                }
+
+                if (!isAnyRegionValid) continue;
+            }
 
             var situationLabel = situationLabelTemplate.Instantiate();
             situationLabel.Q<Label>("situation-label").text =
@@ -82,6 +100,7 @@ public class ExperimentSummary
                     var regionController = new ExperimentRegionRow(regionEntry);
                     regionEntry.userData = regionController;
                     var regionResearchLocation = new ResearchLocation(true, celestialBody.Name, situation, region.Id);
+                    if (!experiment.IsLocationValid(regionResearchLocation, out _)) continue;
 
                     // We previously checked the DataFlavorDescriptions, since we only want to show locations which has been validated by devs, but it appears sometimes they're missing
                     // So we use the ResearchLocationScalar, since we want to omit negative values (es. Kerbin_Beach_Splashed: technically _there is a flavor text_, even if the science is negative)
