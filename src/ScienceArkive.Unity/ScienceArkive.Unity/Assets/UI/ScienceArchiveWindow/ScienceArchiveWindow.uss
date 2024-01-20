@@ -13,6 +13,10 @@
 .spacing-double-dash {
 }
 
+#spacing-top {
+    -unity-font-definition: var(--font-title-big);
+}
+
 #archive-window {
     min-width: 400px;
     max-width: 800px;

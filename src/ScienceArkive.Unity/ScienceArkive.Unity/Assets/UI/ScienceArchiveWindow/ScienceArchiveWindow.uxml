@@ -8,7 +8,7 @@
             </ui:VisualElement>
             <ui:Button text="×" display-tooltip-when-elided="true" name="close-button" style="font-size: 24px; width: 24px; height: 24px; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0;" />
         </ui:VisualElement>
-        <ui:Label tabindex="-1" text="============================================================================================================================" display-tooltip-when-elided="true" name="spacing-top" class="spacing-double-dash" style="-unity-font-definition: url(&apos;project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/LEDCounter7/led_counter-7%20SDF.asset?fileID=11400000&amp;guid=33e1e97b69ec355479ba49006381fc06&amp;type=2#led_counter-7 SDF&apos;); -unity-font: initial; color: rgb(69, 76, 91); overflow: hidden; padding-top: 0;" />
+        <ui:Label tabindex="-1" text="============================================================================================================================" display-tooltip-when-elided="true" name="spacing-top" class="spacing-double-dash" style="color: rgb(69, 76, 91); overflow: hidden; padding-top: 0;" />
         <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-self: stretch; justify-content: space-between; height: 431px;">
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="planet-list" style="width: 210px; height: auto; margin-right: 6px; background-color: rgba(56, 56, 56, 0);" />
             <ui:VisualElement name="main-content" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
