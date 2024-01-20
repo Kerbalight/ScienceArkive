@@ -1,4 +1,8 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/ScienceArchiveWindow/ScienceArchiveWindow.uss?fileID=7433441132597879392&amp;guid=4b9a5620d8b37364fb55a8d875500fc2&amp;type=3#ScienceArchiveWindow" />
-    <ui:Label tabindex="-1" text="// &lt;color=#E7CA76&gt;SITUATION&lt;/color&gt;" display-tooltip-when-elided="true" name="situation-label" style="font-size: 12px; -unity-font-style: normal; color: rgb(105, 109, 255); background-color: rgb(18, 20, 32); padding-left: 6px; padding-top: 6px; border-top-left-radius: 4px; border-bottom-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px;" />
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements"
+         xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements"
+         noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/ScienceArchiveWindow/ScienceArchiveWindow.uss?fileID=7433441132597879392&amp;guid=4b9a5620d8b37364fb55a8d875500fc2&amp;type=3#ScienceArchiveWindow"/>
+    <ui:Label tabindex="-1" text="// &lt;color=#E7CA76&gt;SITUATION&lt;/color&gt;" display-tooltip-when-elided="true"
+              name="situation-label" class="font-normal"
+              style="font-size: 12px; color: rgb(105, 109, 255); background-color: rgb(18, 20, 32); padding-left: 6px; padding-top: 6px; border-top-left-radius: 4px; border-bottom-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px;"/>
 </ui:UXML>

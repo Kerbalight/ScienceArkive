@@ -112,6 +112,10 @@
     -unity-font-definition: var(--font-medium);
 }
 
+.font-normal {
+    -unity-font-style: normal;
+}
+
 #situation-label {
     -unity-font-definition: var(--font-title-big);
 }
