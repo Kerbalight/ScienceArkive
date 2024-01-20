@@ -114,3 +114,12 @@
 .font-pixel-label {
     -unity-font-definition: var(--font-title-big);
 }
+
+.foldout-cover-label {
+    background-color: rgba(46, 53, 64, 0.59);
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    padding-right: 8px;
+}

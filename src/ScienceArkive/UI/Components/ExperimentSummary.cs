@@ -14,7 +14,11 @@ public class ExperimentSummary
 {
     private readonly VisualElement content;
     private readonly Foldout foldout;
+    private readonly Label completedLabel;
     private string _celestialBodyName = "";
+
+    private float _potentialScience = 0f;
+    private float _scoredScience = 0f;
 
     public string ExperimentId { get; private set; } = null!;
 
@@ -27,6 +31,7 @@ public class ExperimentSummary
         foldout = visualElement.Q<Foldout>("foldout-experiment");
         foldout.RegisterValueChangedCallback(OnFoldoutChange);
         content = visualElement.Q<VisualElement>("content");
+        completedLabel = visualElement.Q<Label>("completed-label");
     }
 
     public void ToggleCollapse(bool shouldCollapse = true)
@@ -37,6 +42,12 @@ public class ExperimentSummary
     private void OnFoldoutChange(ChangeEvent<bool> evt)
     {
         MainUIManager.Instance.ArchiveWindowController.CollapsedExperiments[ExperimentId] = evt.newValue;
+    }
+
+    private void UpdatePotentialAndScoredScience(ExperimentRegionRow regionController)
+    {
+        _potentialScience += regionController.PotentialScience;
+        _scoredScience += regionController.ScoredScience;
     }
 
     public void BindExperiment(ExperimentDefinition experiment, CelestialBodyComponent celestialBody,
@@ -58,6 +69,10 @@ public class ExperimentSummary
         var regionEntryTemplate = UIToolkitElement.Load("ScienceArchiveWindow/ExperimentRegionRow.uxml");
 
         var regions = ArchiveManager.Instance.GetRegionsForBody(celestialBody.Name).ToArray();
+
+        // Completed recap
+        _potentialScience = 0f;
+        _scoredScience = 0f;
 
         foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
         {
@@ -114,6 +129,7 @@ public class ExperimentSummary
 
 
                     regionController.Bind(experiment, regionResearchLocation, reports);
+                    UpdatePotentialAndScoredScience(regionController);
                     content.Add(regionEntry);
                 }
             }
@@ -123,6 +139,7 @@ public class ExperimentSummary
                 var regionController = new ExperimentRegionRow(regionEntry);
                 regionEntry.userData = regionController;
                 regionController.Bind(experiment, researchLocation, reports);
+                UpdatePotentialAndScoredScience(regionController);
                 content.Add(regionEntry);
 
                 // Related experiments. Used only for Orbital Survey (25%, 50%, 75%, 100%)
@@ -139,6 +156,7 @@ public class ExperimentSummary
 
                         relatedController.InRelatedContext = true;
                         relatedController.Bind(related, researchLocation, reports);
+                        UpdatePotentialAndScoredScience(regionController);
                         content.Add(relatedEntry);
                     }
                 }
@@ -150,6 +168,9 @@ public class ExperimentSummary
 
     public void Refresh(List<CompletedResearchReport> reports)
     {
+        _potentialScience = 0f;
+        _scoredScience = 0f;
+
         var visibleRegions = ArchiveManager.Instance.GetRegionsForBody(_celestialBodyName,
             Settings.DiscoverablesDisplay.Value == Settings.DiscoverablesDisplayMode.Discovered).ToArray();
 
@@ -162,8 +183,20 @@ public class ExperimentSummary
 
             if (!isVisible) continue;
 
-
             regionController.Bind(regionController.Experiment, regionController.Location, reports);
+            UpdatePotentialAndScoredScience(regionController);
         }
+
+        UpdateCompletedLabel();
+    }
+
+    private void UpdateCompletedLabel()
+    {
+        var completedPercentageLabel = Math.Abs(_scoredScience - _potentialScience) < 0.01f
+            ? "<color=#00ff66>100%</color>"
+            : $"{_scoredScience / _potentialScience:0%}".PadLeft(4);
+
+        completedLabel.text =
+            $"<color=#00FFFF>{_scoredScience:0}</color><size=11>/{_potentialScience:0}</size> <color=#5a60d5>|</color> {completedPercentageLabel}";
     }
 }

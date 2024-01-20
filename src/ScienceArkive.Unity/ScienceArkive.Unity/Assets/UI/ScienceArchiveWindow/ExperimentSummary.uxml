@@ -4,5 +4,6 @@
         <ui:Foldout text="Foldout" name="foldout-experiment" value="true" style="margin-bottom: 8px;">
             <ui:VisualElement name="content" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
         </ui:Foldout>
+        <ui:Label tabindex="-1" text="&lt;color=#00FFFF&gt;10&lt;/color&gt;&lt;size=11&gt;/20&lt;/size&gt; &lt;color=#5a60d5&gt;|&lt;/color&gt; 100%" display-tooltip-when-elided="true" name="completed-label" class="foldout-cover-label" style="position: absolute; right: 7px; top: 7px; font-size: 12px; -unity-text-align: upper-right;" />
     </ui:VisualElement>
 </ui:UXML>

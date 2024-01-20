@@ -1,4 +1,6 @@
-﻿using I2.Loc;
+﻿// #define DEBUG_ADD_FAKE_REPORTS
+
+using I2.Loc;
 using KSP.Game;
 using KSP.Game.Science;
 using ScienceArkive.Manager;
@@ -8,12 +10,15 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using ILogger = SpaceWarp.API.Logging.ILogger;
 
-namespace ScienceArkive.UI;
+namespace ScienceArkive.UI.Components;
 
 public class ExperimentRegionRow
 {
     public ExperimentDefinition Experiment { get; private set; } = null!;
     public ResearchLocation Location { get; private set; } = null!;
+    public float PotentialScience { get; private set; }
+    public float ScoredScience { get; private set; }
+
     public bool InRelatedContext { get; set; }
 
     private readonly VisualElement dataCheck;
@@ -35,6 +40,9 @@ public class ExperimentRegionRow
 
         nameLabel = visualElement.Q<Label>("name-label"); // Currently hidden
         regionLabel = visualElement.Q<Label>("region-label");
+#if DEBUG_ADD_FAKE_REPORTS
+        regionLabel.AddManipulator(new Clickable(OnLabelClicked));
+#endif
 
         sampleContainer = visualElement.Q<VisualElement>("sample");
         sampleIcon = visualElement.Q<VisualElement>("sample-icon");
@@ -90,7 +98,7 @@ public class ExperimentRegionRow
             experiment.ExperimentType == ScienceExperimentType.DataType
                 ? ScienceReportType.DataType
                 : ScienceReportType.SampleType);
-        nameLabel.text = LocalizationManager.GetTranslation(displayName);
+        // nameLabel.text = LocalizationManager.GetTranslation(displayName);
 
         regionLabel.text = !isRegionVisible && isRegionDiscoverable &&
                            Settings.DiscoverablesDisplay.Value == Settings.DiscoverablesDisplayMode.Censored
@@ -98,12 +106,16 @@ public class ExperimentRegionRow
             : ScienceRegionsHelper.GetRegionDisplayName(location.ScienceRegion);
         regionLabel.tooltip = LocalizationManager.GetTranslation(requirements);
 
+
         // Related experiments - add data report name to the region to differentiate
         if (InRelatedContext)
         {
             var dataReportName = dataStore.GetExperimentReportName(expId, ScienceReportType.DataType);
             regionLabel.text += " " + LocalizationManager.GetTranslation(dataReportName);
         }
+
+        PotentialScience = 0f;
+        ScoredScience = 0f;
 
         // Sample
         var completedResearchReports = regionReports as CompletedResearchReport[] ?? regionReports.ToArray();
@@ -119,6 +131,8 @@ public class ExperimentRegionRow
             var sampleValue = GetSampleValue();
             sampleScienceLabel.text = sampleValue.ToString("0.00");
 
+            PotentialScience += sampleValue;
+            ScoredScience += sampleReport?.FinalScienceValue ?? 0f;
             MainUIManager.Instance.ArchiveWindowController.PlanetExperimentsDetail.UpdateDiscoverProgress(sampleValue,
                 sampleReport?.FinalScienceValue ?? 0f);
         }
@@ -140,6 +154,8 @@ public class ExperimentRegionRow
             var dataValue = GetDataValue();
             dataScienceLabel.text = dataValue.ToString("0.00");
 
+            PotentialScience += dataValue;
+            ScoredScience += dataReport?.FinalScienceValue ?? 0f;
             MainUIManager.Instance.ArchiveWindowController.PlanetExperimentsDetail.UpdateDiscoverProgress(dataValue,
                 dataReport?.FinalScienceValue ?? 0f);
 
@@ -155,5 +171,16 @@ public class ExperimentRegionRow
 
 
         //logger.LogInfo($"Bound experiment {report?.ExperimentID} {report}");
+    }
+
+    private void OnLabelClicked(EventBase evt)
+    {
+        logger.LogInfo($"Clicked {evt.target}");
+#if DEBUG_ADD_FAKE_REPORTS
+        var researchReport = new ResearchReport(Experiment.ExperimentID, Experiment.DisplayName, Location,
+            ScienceReportType.DataType, GetDataValue(), "Mocked");
+        var fakeReport = new CompletedResearchReport(researchReport, GetDataValue());
+        GameManager.Instance.Game.ScienceManager.TrySubmitCompletedResearchReport(fakeReport);
+#endif
     }
 }
