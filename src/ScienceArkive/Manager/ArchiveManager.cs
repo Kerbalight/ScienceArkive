@@ -23,6 +23,9 @@ public class ArchiveManager
     private TravelFirsts _firsts = null!;
     private readonly List<string> _unlockedExperimentsIds = [];
 
+    // Old experiment ID, just ignore it
+    private const string OldCrewReportExperimentId = "CrewReport";
+
     /// <summary>
     /// Dictionary of experiments which should be shown together in the same `ExperimentSummary` component.
     /// This is used to group experiments which are similar, like Orbital Survey which provides
@@ -120,7 +123,7 @@ public class ArchiveManager
         [
             // EVA (always available)
             "SurfaceSurvey"
-            // "CrewReport" // Only for KSC? Not sure what to do with this one
+            // "CrewReport" // Old one
         ];
 
 
@@ -261,6 +264,8 @@ public class ArchiveManager
         var experimentDefinitions = new List<ExperimentDefinition>();
         foreach (var experimentId in experimentIds)
         {
+            if (experimentId == OldCrewReportExperimentId) continue;
+
             var definition = experimentDataStore.GetExperimentDefinition(experimentId);
             if (experimentDefinitions.Any(d => d.DisplayName == definition.DisplayName))
                 // Related experiments are grouped together in the same `ExperimentSummary` component.
