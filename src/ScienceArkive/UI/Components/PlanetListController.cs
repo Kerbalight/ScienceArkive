@@ -67,6 +67,7 @@ public class PlanetListController
 
             var menuItem = planetMenuItemTemplate.Instantiate();
             menuItem.Q<Label>("name").text = celestialBody.DisplayName;
+            if (isStar) menuItem.Q<Label>("name").style.marginLeft = -40;
             if (isMoon) menuItem.style.marginLeft = 20;
 
             if (!isStar)

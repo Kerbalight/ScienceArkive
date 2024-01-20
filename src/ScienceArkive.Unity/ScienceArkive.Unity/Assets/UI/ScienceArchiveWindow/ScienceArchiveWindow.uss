@@ -33,22 +33,23 @@
     border-top-width: 0;
     border-bottom-width: 0;
     border-radius: 0;
+    -unity-font-definition: var(--font-regular);
 }
 
 .menu-item:hover {
-    background-color: rgb(70, 62, 125);
+    background-color: rgb(46, 51, 100);
 }
 
 .menu-item__selected {
-    background-color: rgba(70, 62, 125, 0.8);
+    background-color: rgb(46, 51, 100);
 }
 
 .menu-item-border {
     height: 1px;
     background-image: url('project://database/Assets/UI/Icons/DotBorderPattern.png?fileID=2800000&guid=dfb501c70ce009240b24234aacb64266&type=3#DotBorderPattern');
-    background-size: auto;
-    background-repeat: repeat;
-    -unity-background-image-tint-color: rgb(154, 155, 183);
+    background-size: contain;
+    background-repeat: repeat-x;
+    -unity-background-image-tint-color: rgb(79, 86, 101);
 }
 
 .progress.unity-progress-bar {
