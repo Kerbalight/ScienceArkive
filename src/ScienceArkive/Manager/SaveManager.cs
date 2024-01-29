@@ -22,6 +22,7 @@ public class SaveManager
     {
         dataToSave.WindowPosition = MainUIManager.Instance.ArchiveWindowController.WindowPosition;
         dataToSave.SelectedBody = MainUIManager.Instance.ArchiveWindowController.SelectedCelestialBody?.Name;
+        dataToSave.DiscoveredBodies = ArchiveManager.Instance.DiscoveredBodies.ToList();
     }
 
     private void LoadGameData(SaveData dataToLoad)
@@ -47,6 +48,9 @@ public class SaveManager
             else
                 _Logger.LogWarning($"Could not find body {loadedSaveData.SelectedBody}");
         }
+
+        if (loadedSaveData.DiscoveredBodies != null)
+            ArchiveManager.Instance.DiscoveredBodies = [..loadedSaveData.DiscoveredBodies];
 
         MainUIManager.Instance.ArchiveWindowController.ReloadAfterSaveLoad();
         loadedSaveData = null;

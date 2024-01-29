@@ -27,6 +27,7 @@ public class MessageListener
         MessageCenter.PersistentSubscribe<VesselScienceSituationChangedMessage>(OnVesselScienceSituationChangedMessage);
         MessageCenter.PersistentSubscribe<GameStateChangedMessage>(HideWindowOnInvalidState);
         MessageCenter.PersistentSubscribe<TechTierUnlockedMessage>(OnTechTierUnlockedMessage);
+        MessageCenter.PersistentSubscribe<SOIEnteredMessage>(OnSOIEntered);
     }
 
     private void OnGameLoadFinishedMessage(MessageCenterMessage message)
@@ -48,6 +49,10 @@ public class MessageListener
     private static void OnVesselScienceSituationChangedMessage(MessageCenterMessage message)
     {
         // Beware, this message is sent for every vessel, not just the active one.
+        if (message is not VesselScienceSituationChangedMessage changedMessage) return;
+        if (changedMessage.Vessel?.mainBody?.bodyName != null)
+            ArchiveManager.Instance.DiscoveredBodies.Add(changedMessage.Vessel.mainBody.bodyName);
+
         MainUIManager.Instance.ArchiveWindowController.IsDirty = true;
     }
 
@@ -58,6 +63,19 @@ public class MessageListener
     private static void OnTechTierUnlockedMessage(MessageCenterMessage message)
     {
         ArchiveManager.Instance.InitializeUnlockedExperiments();
+        MainUIManager.Instance.ArchiveWindowController.IsDirty = true;
+    }
+
+    /// <summary>
+    /// This is technically redundant since we already get the message from <see cref="OnVesselScienceSituationChangedMessage"/>,
+    /// but this is a solid backup.
+    /// </summary>
+    private static void OnSOIEntered(MessageCenterMessage message)
+    {
+        if (message is not SOIEnteredMessage soiEnteredMessage) return;
+        if (soiEnteredMessage.bodyEntered?.bodyName == null) return;
+        ArchiveManager.Instance.DiscoveredBodies.Add(soiEnteredMessage.bodyEntered.bodyName);
+
         MainUIManager.Instance.ArchiveWindowController.IsDirty = true;
     }
 

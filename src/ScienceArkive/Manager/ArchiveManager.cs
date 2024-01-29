@@ -23,6 +23,11 @@ public class ArchiveManager
     private TravelFirsts _firsts = null!;
     private readonly List<string> _unlockedExperimentsIds = [];
 
+    /// <summary>
+    /// We keep track of the bodies which have been discovered by the player.
+    /// </summary>
+    public HashSet<string> DiscoveredBodies { get; set; } = [];
+
     // Old experiment ID, just ignore it
     private const string OldCrewReportExperimentId = "CrewReport";
 
@@ -176,7 +181,8 @@ public class ArchiveManager
     /// <returns></returns>
     public IEnumerable<string> GetCelestialBodiesNames(bool onlyDiscovered = false)
     {
-        return CelestialBodiesScienceData.Keys.Where(cb => !onlyDiscovered || _firsts.SOIReached.ContainsKey(cb));
+        return CelestialBodiesScienceData.Keys.Where(cb =>
+            !onlyDiscovered || _firsts.SOIReached.ContainsKey(cb) || DiscoveredBodies.Contains(cb));
     }
 
     /// <summary>

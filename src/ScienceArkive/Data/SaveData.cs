@@ -10,5 +10,10 @@ public class SaveData
     public Vector3? WindowPosition;
     public string? SelectedBody;
 
+    /// <summary>
+    /// Using TravelFirsts from KSP2 is not sufficient because some times a body will be skipped 
+    /// </summary>
+    public List<string>? DiscoveredBodies = [];
+
     public Dictionary<string, Dictionary<string, bool>> OpenedExperiments = new();
 }
