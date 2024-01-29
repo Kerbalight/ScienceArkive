@@ -114,6 +114,7 @@ public class ExperimentRegionRow
             regionLabel.text += " " + LocalizationManager.GetTranslation(dataReportName);
         }
 
+        var scienceDifficultyMultiplier = ArchiveManager.GetScienceDifficultyMultiplier();
         PotentialScience = 0f;
         ScoredScience = 0f;
 
@@ -129,12 +130,13 @@ public class ExperimentRegionRow
             sampleCheck.style.visibility = sampleReport == null ? Visibility.Hidden : Visibility.Visible;
 
             var sampleValue = GetSampleValue();
+            var sampleScoredValue = (sampleReport?.FinalScienceValue ?? 0f) * scienceDifficultyMultiplier;
             sampleScienceLabel.text = sampleValue.ToString("0.00");
 
             PotentialScience += sampleValue;
-            ScoredScience += sampleReport?.FinalScienceValue ?? 0f;
+            ScoredScience += sampleScoredValue;
             MainUIManager.Instance.ArchiveWindowController.PlanetExperimentsDetail.UpdateDiscoverProgress(sampleValue,
-                sampleReport?.FinalScienceValue ?? 0f);
+                sampleScoredValue);
         }
         else
         {
@@ -152,23 +154,23 @@ public class ExperimentRegionRow
             dataCheck.style.visibility = dataReport == null ? Visibility.Hidden : Visibility.Visible;
 
             var dataValue = GetDataValue();
+            var dataScoredValue = (dataReport?.FinalScienceValue ?? 0f) * scienceDifficultyMultiplier;
             dataScienceLabel.text = dataValue.ToString("0.00");
 
             PotentialScience += dataValue;
-            ScoredScience += dataReport?.FinalScienceValue ?? 0f;
+            ScoredScience += dataScoredValue;
             MainUIManager.Instance.ArchiveWindowController.PlanetExperimentsDetail.UpdateDiscoverProgress(dataValue,
-                dataReport?.FinalScienceValue ?? 0f);
+                dataScoredValue);
 
-            if (dataReport.HasValue && Math.Abs(dataReport.Value.FinalScienceValue - GetDataValue()) > 1E-5f)
-                logger.LogWarning(
-                    $"Science value mismatch for {reportName} ({dataReport.Value.ResearchLocationID}): {dataReport?.FinalScienceValue} != {GetDataValue()}");
+            // if (dataReport.HasValue && Math.Abs(dataReport.Value.FinalScienceValue - GetDataValue()) > 1E-5f)
+            //     logger.LogWarning(
+            //         $"Science value mismatch for {reportName} ({dataReport.Value.ResearchLocationID}): {dataReport?.FinalScienceValue} != {GetDataValue()}");
         }
         else
         {
             dataCheck.style.visibility = Visibility.Hidden;
             dataContainer.style.visibility = Visibility.Hidden;
         }
-
 
         //logger.LogInfo($"Bound experiment {report?.ExperimentID} {report}");
     }
