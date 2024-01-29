@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using KSP.Game;
 using KSP.Input;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace ScienceArkive.API.Extensions;
@@ -9,13 +10,43 @@ public static class UIToolkitExtensions
 {
     private static readonly ManualLogSource _Logger = Logger.CreateLogSource("ScienceArkive.UIToolkitExtensions");
 
-    public static GameInstance Game => GameManager.Instance.Game;
+    private static GameInstance Game => GameManager.Instance.Game;
+
+    private static List<InputAction> _maskedInputActions = [];
+
+    private static List<InputAction> MaskedInputActions
+    {
+        get
+        {
+            if (_maskedInputActions.Count == 0)
+                _maskedInputActions =
+                [
+                    Game.Input.Flight.CameraZoom,
+                    Game.Input.Flight.mouseDoubleTap,
+                    Game.Input.Flight.mouseSecondaryTap,
+
+                    Game.Input.MapView.cameraZoom,
+                    Game.Input.MapView.Focus,
+                    Game.Input.MapView.mousePrimary,
+                    Game.Input.MapView.mouseSecondary,
+                    Game.Input.MapView.mouseTertiary,
+                    Game.Input.MapView.mousePosition,
+
+                    Game.Input.VAB.cameraZoom,
+                    Game.Input.VAB.mousePrimary,
+                    Game.Input.VAB.mouseSecondary
+                ];
+
+            return _maskedInputActions;
+        }
+    }
+
+    private static readonly Dictionary<int, bool> MaskedInputActionsState = new();
 
     /// <summary>
     /// Stop the mouse events (scroll and click) from propagating to the game (e.g. zoom).
     /// The only place where the Click still doesn't get stopped is in the MapView, neither the Focus or the Orbit mouse events.
     /// </summary>
-    /// <param name="element"></param>
     public static void StopMouseEventsPropagation(this VisualElement element)
     {
         element.RegisterCallback<PointerEnterEvent>(OnVisualElementPointerEnter);
@@ -24,37 +55,21 @@ public static class UIToolkitExtensions
 
     private static void OnVisualElementPointerEnter(PointerEnterEvent evt)
     {
-        Game.Input.Flight.CameraZoom.Disable();
-        Game.Input.Flight.mouseDoubleTap.Disable();
-        Game.Input.Flight.mouseSecondaryTap.Disable();
-
-        Game.Input.MapView.cameraZoom.Disable();
-        Game.Input.MapView.Focus.Disable();
-        Game.Input.MapView.mousePrimary.Disable();
-        Game.Input.MapView.mouseSecondary.Disable();
-        Game.Input.MapView.mouseTertiary.Disable();
-        Game.Input.MapView.mousePosition.Disable();
-
-        Game.Input.VAB.cameraZoom.Disable();
-        Game.Input.VAB.mousePrimary.Disable();
-        Game.Input.VAB.mouseSecondary.Disable();
+        for (var i = 0; i < MaskedInputActions.Count; i++)
+        {
+            var inputAction = MaskedInputActions[i];
+            MaskedInputActionsState[i] = inputAction.enabled;
+            inputAction.Disable();
+        }
     }
 
     private static void OnVisualElementPointerLeave(PointerLeaveEvent evt)
     {
-        Game.Input.Flight.CameraZoom.Enable();
-        Game.Input.Flight.mouseDoubleTap.Enable();
-        Game.Input.Flight.mouseSecondaryTap.Enable();
-
-        Game.Input.MapView.cameraZoom.Enable();
-        Game.Input.MapView.Focus.Enable();
-        Game.Input.MapView.mousePrimary.Enable();
-        Game.Input.MapView.mouseSecondary.Enable();
-        Game.Input.MapView.mouseTertiary.Enable();
-        Game.Input.MapView.mousePosition.Enable();
-
-        Game.Input.VAB.cameraZoom.Enable();
-        Game.Input.VAB.mousePrimary.Enable();
-        Game.Input.VAB.mouseSecondary.Enable();
+        for (var i = 0; i < MaskedInputActions.Count; i++)
+        {
+            var inputAction = MaskedInputActions[i];
+            if (MaskedInputActionsState[i])
+                inputAction.Enable();
+        }
     }
 }
