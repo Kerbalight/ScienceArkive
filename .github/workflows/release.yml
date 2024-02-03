@@ -37,11 +37,13 @@ jobs:
         run: |
           version=$(jq -r '.version' plugin_template/swinfo.json)
           echo "Version is $version"
+          echo "version=$version" >> $GITHUB_ENV
           dotnet build "ScienceArkive.sln" -c Release
           echo "release_filename=ScienceArkive-$version.zip" >> $GITHUB_ENV
           echo "zip=$(ls -1 dist/ScienceArkive-*.zip | head -n 1)" >> $GITHUB_ENV
           echo "upload_url=$(wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq '.[0].upload_url' | tr -d \")" >> $GITHUB_ENV
-
+          wget -qO- https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq -r '.[0].body' > ./changelog.md
+          
       - name: Upload zip to release
         uses: shogo82148/actions-upload-release-asset@v1.7.2
         env:
