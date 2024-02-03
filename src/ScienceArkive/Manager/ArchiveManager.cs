@@ -250,8 +250,18 @@ public class ArchiveManager
     public bool ShouldSkipExperimentInResearchLocation(ExperimentDefinition definition, ResearchLocation location)
     {
         var scienceRegionsDataProvider = GameManager.Instance.Game.ScienceManager.ScienceRegionsDataProvider;
-        if (location.ScienceSituation == ScienceSitutation.LowOrbit &&
+        if (location.ScienceSituation == ScienceSitutation.LowOrbit && !string.IsNullOrEmpty(location.ScienceRegion) &&
             scienceRegionsDataProvider.IsRegionADiscoverable(location.BodyName, location.ScienceRegion))
+            return true;
+
+        return false;
+    }
+
+    public bool ShouldSkipExperimentInCelestialBody(ExperimentDefinition definition, string bodyName)
+    {
+        // Orbital Survey (mod) not available in Kerbol
+        if ((definition.ExperimentID.StartsWith("orbital_survey_visual_mapping") ||
+             definition.ExperimentID.StartsWith("orbital_survey_biome_mapping")) && bodyName == "Kerbol")
             return true;
 
         return false;
