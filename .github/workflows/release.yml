@@ -1,5 +1,8 @@
 name: Upload release
 
+env:
+  SPACEDOCK_MOD_ID: 3541 # ScienceArkive
+  
 on:
   release:
     types: [ "published" ]
@@ -19,6 +22,16 @@ jobs:
 
       - name: Install jq
         uses: dcarbone/install-jq-action@v2.1.0
+        
+      - name: Check version
+        run: |
+          version=$(jq -r '.version' plugin_template/swinfo.json)
+          echo "Tag is ${{ github.ref_name }}"
+          if [[ "${{ github.ref_name }}" != "v$version" ]];
+          then
+            echo "Invalid version tag: ${{ github.ref_name }}. Expected v$version."
+            exit 1
+          fi
 
       - name: Build the solution
         run: |
@@ -38,4 +51,18 @@ jobs:
           asset_path: ${{ env.zip }}
           asset_name: ${{ env.release_filename }}
           asset_content_type: application/zip
+          
+      - name: Add Mask
+        run: echo "::add-mask::${{ secrets.SPACEDOCK_PASSWORD }}"
+
+      - name: Update mod on SpaceDock
+        uses: KSP2Community/spacedock-upload@v1.0.0
+        with:
+          username: ${{ secrets.SPACEDOCK_USER }}
+          password: ${{ secrets.SPACEDOCK_PASSWORD }}
+          game_id: 22407
+          mod_id: ${{ env.SPACEDOCK_MOD_ID }}
+          version: ${{ env.version }}
+          zipball: ${{ env.zip }}
+          changelog: ./changelog.md
 
