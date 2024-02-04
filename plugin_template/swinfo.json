@@ -5,7 +5,7 @@
   "name": "Science Arkive",
   "description": "See all science experiments in one place, browse by planet and region and check where you can gather more points",
   "source": "https://github.com/Kerbalight/ScienceArkive",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "version_check": "https://raw.githubusercontent.com/Kerbalight/ScienceArkive/main/plugin_template/swinfo.json",
   "ksp2_version": {
     "min": "0.2.0",
@@ -15,7 +15,7 @@
     {
       "id": "com.github.x606.spacewarp",
       "version": {
-        "min": "1.7.0",
+        "min": "1.9.1",
         "max": "*"
       }
     }
