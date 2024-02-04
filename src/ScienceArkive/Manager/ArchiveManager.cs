@@ -31,6 +31,9 @@ public class ArchiveManager
     // Old experiment ID, just ignore it
     private const string OldCrewReportExperimentId = "CrewReport";
 
+    // Discoverables which are present in the game but are Hidden
+    private HashSet<string> HiddenDiscoverableRegionsIds { get; } = ["KerbinGlacier"];
+
     /// <summary>
     /// Dictionary of experiments which should be shown together in the same `ExperimentSummary` component.
     /// This is used to group experiments which are similar, like Orbital Survey which provides
@@ -250,8 +253,16 @@ public class ArchiveManager
     public bool ShouldSkipExperimentInResearchLocation(ExperimentDefinition definition, ResearchLocation location)
     {
         var scienceRegionsDataProvider = GameManager.Instance.Game.ScienceManager.ScienceRegionsDataProvider;
-        if (location.ScienceSituation == ScienceSitutation.LowOrbit && !string.IsNullOrEmpty(location.ScienceRegion) &&
-            scienceRegionsDataProvider.IsRegionADiscoverable(location.BodyName, location.ScienceRegion))
+        var isDiscoverable = !string.IsNullOrEmpty(location.ScienceRegion) &&
+                             scienceRegionsDataProvider.IsRegionADiscoverable(location.BodyName,
+                                 location.ScienceRegion);
+
+        // No way to take experiments in "Low Orbit" on a discoverable
+        if (location.ScienceSituation == ScienceSitutation.LowOrbit && isDiscoverable)
+            return true;
+
+        // "KerbinGlacier"
+        if (HiddenDiscoverableRegionsIds.Contains(location.ScienceRegion))
             return true;
 
         return false;
