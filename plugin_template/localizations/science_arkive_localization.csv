@@ -2,3 +2,4 @@ Key,Type,Desc,English,German,French,Italian,Spanish,Japanese,Korean,Polish,Russi
 ScienceArkive/UI/ExperimentsArchive,Text,Should always be in uppercase since it is used in the title,EXPERIMENTS ARCHIVE,,,ARCHIVIO ESPERIMENTI,,,,,,实验档案馆,,
 ScienceArkive/UI/CollapseAll,Text,,Collapse all,,,Riduci tutti,,,,,,全部折叠,,
 ScienceArkive/UI/TotalSciencePoints,Text,,Total Science Points:,,,Punti Scienza Totali:,,,,,,科研点总数,,
+ScienceArkive/UI/Everywhere,Text,,Everywhere,,,Ovunque,,,,,,到处,,
