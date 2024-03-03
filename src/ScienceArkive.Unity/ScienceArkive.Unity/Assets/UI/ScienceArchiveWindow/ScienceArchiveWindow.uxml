@@ -3,12 +3,12 @@
     <ui:VisualElement name="archive-window" class="root">
         <ui:VisualElement name="title-bar" style="height: auto; margin-bottom: 2px; margin-top: 2px;">
             <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-start; align-self: center;">
-                <ui:VisualElement name="window-icon" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; justify-content: flex-start; align-self: center; margin-right: 8px;" />
+                <ui:VisualElement name="window-icon" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); width: 16px; height: 16px; justify-content: center; align-self: center; margin-right: 8px; align-items: center;" />
                 <ui:Label tabindex="-1" text="#ScienceArkive/UI/ExperimentsArchive" display-tooltip-when-elided="true" class="font-pixel-label" style="font-size: 14px;" />
+                <ui:Label tabindex="-1" text="---------------------------------------------------------------------------------------------------------------------------/" display-tooltip-when-elided="true" class="font-pixel-subtitle" style="font-size: 13px; padding-bottom: 0; margin-left: 3px; color: rgb(59, 64, 75); white-space: nowrap; -unity-text-align: middle-right; padding-top: 2px; align-self: center; justify-content: flex-start; flex-grow: 1; margin-right: 3px; text-overflow: clip; flex-shrink: 1; overflow: hidden;" />
             </ui:VisualElement>
-            <ui:Button text="×" display-tooltip-when-elided="true" name="close-button" style="font-size: 24px; width: 24px; height: 24px; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0;" />
+            <ui:Button display-tooltip-when-elided="true" name="close-button" style="background-image: url(&apos;project://database/Assets/UI/Icons/ICO-Close-med.png?fileID=21300000&amp;guid=10109f31c868d29499efd98c5a3568f3&amp;type=3#ICO-Close-med&apos;);" />
         </ui:VisualElement>
-        <ui:Label tabindex="-1" text="============================================================================================================================" display-tooltip-when-elided="true" name="spacing-top" class="spacing-double-dash" style="color: rgb(69, 76, 91); overflow: hidden; padding-top: 0;" />
         <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-self: stretch; justify-content: space-between; height: 431px;">
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="planet-list" style="width: 210px; height: auto; margin-right: 6px; background-color: rgba(56, 56, 56, 0);" />
             <ui:VisualElement name="main-content" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />

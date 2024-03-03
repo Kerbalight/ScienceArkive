@@ -1,3 +1,41 @@
+:root {
+    --black: rgb(0, 0, 0);
+    --purple-2: rgb(113, 117, 255);
+    --purple-3: rgb(98, 102, 242);
+    --purple-4: rgb(83, 86, 204);
+    --purple-5: rgb(68, 70, 166);
+    --purple-6: rgb(53, 55, 128);
+    --purple-7: rgb(46, 51, 100);
+    --red: rgb(255, 91, 72);
+    --dark-red: rgb(133, 13, 0);
+    --orange: rgb(231, 111, 84);
+    --yellow: rgb(231, 202, 118);
+    --background-lightgray-4: rgb(122, 133, 153);
+    --blue-3-translucent: rgba(105, 109, 255, 0.5);
+    --blue-5-translucent: rgba(83, 86, 204, 0.5);
+    --lightgray-2: rgb(132, 140, 157);
+    --lightgray-3: rgb(85, 88, 102);
+    --gray-1: rgb(71, 74, 86);
+    --gray-2: rgb(46, 53, 64);
+    --gray-3: rgb(46, 53, 64);
+    --gray-4: rgb(33, 38, 46);
+    --gray-5: rgb(29, 32, 41);
+    --gray-6: rgb(25, 31, 37);
+    --gray-7: rgb(25, 28, 34);
+    --input-bg: var(--gray-7);
+    --button-bg: var(--gray-6);
+    --blue-1: rgb(134, 144, 255);
+    --blue-3: rgb(105, 109, 255);
+    --blue-4: rgb(92, 96, 222);
+    --blue-5: rgb(83, 86, 204);
+    --darkblue-3: rgb(0, 22, 50);
+    --hover-bg: var(--darkblue-3);
+    --darkblue-4: rgb(13, 13, 22);
+    --led-green: rgb(0, 255, 102);
+    --text-color: rgb(192, 199, 213);
+}
+
+
 #title-bar {
     justify-content: space-between;
     flex-direction: row;
@@ -41,11 +79,15 @@
 }
 
 .menu-item:hover {
-    background-color: rgb(46, 51, 100);
+    background-color: var(--purple-7);
 }
 
 .menu-item__selected {
-    background-color: rgb(46, 51, 100);
+    background-color: var(--purple-5);
+}
+
+.menu-item__selected:hover {
+    background-color: var(--purple-5);
 }
 
 .menu-item-border {
@@ -124,6 +166,10 @@
     -unity-font-definition: var(--font-title-big);
 }
 
+.font-pixel-subtitle {
+    -unity-font-definition: var(--font-title-small);
+}
+
 .foldout-cover-label {
     background-color: rgba(46, 53, 64, 0.59);
     border-top-left-radius: 4px;
@@ -131,4 +177,32 @@
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     padding-right: 8px;
+}
+
+#close-button {
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    max-height: 12px;
+    max-width: 12px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    -unity-background-scale-mode: scale-to-fit;
+    margin-right: 4px;
+    -unity-background-image-tint-color: var(--background-lightgray-4);
+}
+
+#close-button:hover {
+    -unity-background-image-tint-color: var(--dark-red);
 }
