@@ -18,7 +18,7 @@ public class SaveManager
         ModSaves.RegisterSaveLoadGameData<SaveData>(ScienceArkivePlugin.ModGuid, SaveGameData, LoadGameData);
     }
 
-    private void SaveGameData(SaveData dataToSave)
+    private static void SaveGameData(SaveData dataToSave)
     {
         dataToSave.WindowPosition = MainUIManager.Instance.ArchiveWindowController.WindowPosition;
         dataToSave.SelectedBody = MainUIManager.Instance.ArchiveWindowController.SelectedCelestialBody?.Name;

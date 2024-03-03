@@ -247,7 +247,7 @@ public class ArchiveManager
     }
 
     /// <summary>
-    /// Some experiments are not available in certain locations. We could not use `IsLocationValid` since it
+    /// Some experiments are not available in certain locations. We cannot use `IsLocationValid` since it
     /// doesn't check for discoverables.
     /// </summary>
     public bool ShouldSkipExperimentInResearchLocation(ExperimentDefinition definition, ResearchLocation location)
@@ -263,16 +263,6 @@ public class ArchiveManager
 
         // "KerbinGlacier"
         if (HiddenDiscoverableRegionsIds.Contains(location.ScienceRegion))
-            return true;
-
-        return false;
-    }
-
-    public bool ShouldSkipExperimentInCelestialBody(ExperimentDefinition definition, string bodyName)
-    {
-        // Orbital Survey (mod) not available in Kerbol
-        if ((definition.ExperimentID.StartsWith("orbital_survey_visual_mapping") ||
-             definition.ExperimentID.StartsWith("orbital_survey_biome_mapping")) && bodyName == "Kerbol")
             return true;
 
         return false;

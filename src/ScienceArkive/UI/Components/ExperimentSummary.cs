@@ -2,6 +2,8 @@
 using KSP.Game;
 using KSP.Game.Science;
 using KSP.Sim.impl;
+using ScienceArkive.API.Extensions;
+using ScienceArkive.Data;
 using ScienceArkive.Manager;
 using ScienceArkive.UI.Components;
 using ScienceArkive.Utils;
@@ -81,7 +83,7 @@ public class ExperimentSummary
 
             // Then we need to check if the experiment is valid for this location
             var researchLocation = new ResearchLocation(false, celestialBody.Name, situation, "");
-            var isLocationValid = experiment.IsLocationValid(researchLocation, out var regionRequired);
+            var isLocationValid = experiment.IsArchiveLocationValid(researchLocation, out var regionRequired);
             if (!isLocationValid)
             {
                 // If the experiment requires a region, we need to check if there is at least one valid region.
@@ -91,7 +93,7 @@ public class ExperimentSummary
                 foreach (var region in regions)
                 {
                     var regionResearchLocation = new ResearchLocation(true, celestialBody.Name, situation, region.Id);
-                    if (experiment.IsLocationValid(regionResearchLocation, out _))
+                    if (experiment.IsArchiveLocationValid(regionResearchLocation, out _))
                     {
                         isAnyRegionValid = true;
                         regionRequired = true;
@@ -103,8 +105,10 @@ public class ExperimentSummary
             }
 
             var situationLabel = situationLabelTemplate.Instantiate();
+            var situationText = situation.GetTranslatedDescription();
+
             situationLabel.Q<Label>("situation-label").text =
-                "// <color=#E7CA76>" + situation.GetTranslatedDescription().ToUpper() + "</color>";
+                "// <color=#E7CA76>" + situationText.ToUpper() + "</color>";
             content.Add(situationLabel);
 
             if (regionRequired)
@@ -115,7 +119,7 @@ public class ExperimentSummary
                     var regionController = new ExperimentRegionRow(regionEntry);
                     regionEntry.userData = regionController;
                     var regionResearchLocation = new ResearchLocation(true, celestialBody.Name, situation, region.Id);
-                    if (!experiment.IsLocationValid(regionResearchLocation, out _)) continue;
+                    if (!experiment.IsArchiveLocationValid(regionResearchLocation, out _)) continue;
 
                     // Skip experiments which are not available in this region. E.g. OrbitalSurvey_LowOrbit_<Discoverable>
                     if (ArchiveManager.Instance.ShouldSkipExperimentInResearchLocation(experiment,
@@ -126,7 +130,6 @@ public class ExperimentSummary
                     // We should probably double check how KSP2 does it by itself
                     ArchiveManager.Instance.GetResearchLocationScalar(regionResearchLocation, out var scienceScalar);
                     if (scienceScalar < 0f) continue;
-
 
                     regionController.Bind(experiment, regionResearchLocation, reports);
                     UpdatePotentialAndScoredScience(regionController);

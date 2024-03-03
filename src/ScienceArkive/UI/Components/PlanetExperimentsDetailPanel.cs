@@ -89,24 +89,20 @@ public class PlanetExperimentsDetailPanel
         // Available experiments
         var allExperiments = ArchiveManager.Instance.GetExperimentDefinitions();
         var experiments = new List<ExperimentDefinition>();
+
         foreach (var experiment in allExperiments)
+        foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
         {
-            if (ArchiveManager.Instance.ShouldSkipExperimentInCelestialBody(experiment, celestialBody.bodyName))
-                continue;
+            //  we need to check if it's _possible_ to reach this location (es Kerbol_Splashed in invalid)
+            if (!ArchiveManager.Instance.ExistsBodyScienceSituation(celestialBody, situation)) continue;
 
-            foreach (ScienceSitutation situation in Enum.GetValues(typeof(ScienceSitutation)))
-            {
-                //  we need to check if it's _possible_ to reach this location (es Kerbol_Splashed in invalid)
-                if (!ArchiveManager.Instance.ExistsBodyScienceSituation(celestialBody, situation)) continue;
+            var researchLocation = new ResearchLocation(true, celestialBody.Name, situation, "");
+            // Then we need to check if the experiment is valid for this location
+            var isLocationValid = experiment.IsArchiveLocationValid(researchLocation, out var regionRequired);
+            if (!isLocationValid) continue;
 
-                var researchLocation = new ResearchLocation(true, celestialBody.Name, situation, "");
-                // Then we need to check if the experiment is valid for this location
-                var isLocationValid = experiment.IsLocationValid(researchLocation, out var regionRequired);
-                if (!isLocationValid) continue;
-
-                experiments.Add(experiment);
-                break;
-            }
+            experiments.Add(experiment);
+            break;
         }
 
         // UI
